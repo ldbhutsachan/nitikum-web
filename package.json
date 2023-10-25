@@ -10,8 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@invictus.codes/nuxt-vuetify": "^0.3.0",
     "@nuxt/devtools": "latest",
     "nuxt": "^3.8.0",
+    "nuxt-icon": "^0.5.0",
     "vue": "^3.3.6",
     "vue-router": "^4.2.5"
   },
@@ -19,8 +21,9 @@
     "@mdi/font": "^7.3.67",
     "@nuxtjs/axios": "^5.13.6",
     "@pinia/nuxt": "^0.5.1",
+    "axios": "^1.5.1",
     "moment": "^2.29.4",
-    "sass": "^1.69.4",
-    "vuetify": "^3.3.22"
+    "sass": "^1.69.4"
   }
 }
+

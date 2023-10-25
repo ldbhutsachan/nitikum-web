@@ -2,7 +2,7 @@
     <v-app>
         <Header />
         <Drawer />
-        <v-main>
+        <v-main style="background-color: #EDF5F9;">
             <div class="pa-10">
                 <slot></slot>
             </div>
