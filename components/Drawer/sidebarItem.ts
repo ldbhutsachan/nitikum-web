@@ -9,26 +9,33 @@ export default [
         {
           title: "ກຸ່ມບໍລິສັດ",
           icon: "formkit:group",
-          to: "/Groups",
+          to: "/groups",
         },
         {
           title: "ບໍລິສັດ",
           icon: "carbon:location-company",
-          to: "/Companies",
+          to: "/companies",
         },
         {
           title: "User ເຂົ້າໃຊ້ງານ",
           icon: "ph:user-plus",
-          to: "/Users",
+          to: "/users",
         },
         
       ],
     },
     {
-      divider:'divider'
+      title: "ຕັ້ງຄ່າທຳນຽມ",
+      icon: "carbon:service-id",
+      to: "/users",
     },
+    // {
+    //   divider:'divider'
+    // },
     
-  
+    // {
+    //   divider:'divider'
+    // },
   
   ];
   

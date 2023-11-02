@@ -29,10 +29,9 @@ const sidebarMenu = ref(sidebarItems);
             </v-btn>
           </div>
         </v-list-group>
-        <v-divider v-if="item.divider"></v-divider>
-        <v-list-item v-if="!item.divider && !item.children" :key="i" rounded="lg" class="mb-1">
-            <v-list-item-title style="color: black;">
-              <Icon :name="item.icon" color="#ccc" size="20" />
+        <v-list-item v-if="!item.children" :key="i" rounded="lg" class="mb-1" :to="item.to">
+            <v-list-item-title style="color: black;" >
+              <Icon :name="item.icon" color="#999" size="30" />
               <span v-if="!customizer.mini_sidebar" class="ml-2">{{ item.title }}</span>
             </v-list-item-title>
         </v-list-item>
@@ -44,13 +43,6 @@ const sidebarMenu = ref(sidebarItems);
           <span v-if="!customizer.mini_sidebar" class="ml-2">ອອກຈາກລະບົບ</span>
         </v-btn>
       </div>
-
     </v-list>
-    <!-- <v-list>
-      <v-list-item prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg" title="Sandra Adams"
-        subtitle="sandra_a88@gmailcom"></v-list-item>
-    </v-list> -->
-
-
   </v-navigation-drawer>
 </template>
