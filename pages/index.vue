@@ -1,6 +1,8 @@
 <template>
     <div>
-        <h1>Hill</h1>
+        <v-card width="1200" class="mx-auto">
+            <v-card-text></v-card-text>
+        </v-card>
     </div>
 </template>
 <script setup lang="ts">

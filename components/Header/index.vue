@@ -1,62 +1,35 @@
 <template>
-    <v-app-bar :color="customizer.darktheme ? '' : customizer.navbarColor" elevation="5">
-        <div class="pa-4 pl-4" style="display: flex;justify-content: center;align-items: center;">
-            <img src="../../assets/icons/logo.png" width="40" height="40" />
-        </div>
-        <h2>LDB Biz</h2>
-        <div style="width: 60px;"></div>
-        <v-btn v-if="!customizer.mini_sidebar" icon @click.stop="customizer.SET_MINI_SIDEBAR(!customizer.mini_sidebar)">
-            <Icon name="tdesign:menu-unfold" size="20" />
-        </v-btn>
-        <v-btn v-else icon @click.stop="customizer.SET_MINI_SIDEBAR(!customizer.mini_sidebar)">
-            <Icon name="ant-design:menu-unfold-outlined" size="20" />
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn icon class="mr-4">
-            <Icon name="carbon:notification-new" size="30" />
-        </v-btn>
-        <!-- <v-btn icon class="mr-4"><Icon name="et:profile-male" size="30" /></v-btn> -->
-        <v-menu>
-            <template v-slot:activator="{ props }">
-                <v-btn icon v-bind="props">
-                    <Icon name="et:profile-male" size="30" />
-                </v-btn>
-            </template>
-            <v-card width="280" class="pa-2" rounded="lg">
-                <v-card-title>User profile</v-card-title>
-                <v-divider></v-divider>
-
-                <div style="width: 100%;display: flex;flex-direction: row;justify-content: start;align-items: center;"
-                    class="pa-2 pt-4">
+    <v-app-bar :color="customizer.darktheme ? '' : customizer.navbarColor" elevation="5" height="150">
+        
+        <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;width: 100%;">
+            <v-card width="1200" color="#191947" class="mx-auto pt-4" elevation="0">
+                <div class="d-flex align-center">
+                    <img src="../../assets/icons/logo.png" width="80" height="80" />
+                    <v-spacer></v-spacer>
                     <div
-                        style="width: 45px;height: 45px;border-radius: 50px;background-color: #000;display: flex;justify-content: center;align-items: center;flex-direction: row;">
-                        <Icon name="et:profile-male" color="white" size="30" />
+                        style="display: flex;flex-direction: column;justify-content: center;align-items: center;line-height: 30px;">
+                        <span style="font-size: 20pt;">ລະບົບຄຸ້ມຄອງນິຕິກຳ</span>
+                        <span style="font-size: 20pt;">Legal Management System</span>
                     </div>
-                    <h3 class="ml-4">Some one</h3>
+                    <v-spacer></v-spacer>
+                    <img src="../../assets/icons/logo.png" width="80" height="80" />
                 </div>
-
-                <div v-if="acitve" style="width: 100%;display: flex;flex-direction: row;justify-content: start;align-items: center;background-color: #E0E0E0;border-radius: 5px;cursor: pointer;"
-                    class="pa-2" @mouseleave="acitve = false">
-                    <div
-                        style="width: 45px;height: 45px;border-radius: 50px;background-color: #FFEAED;display: flex;justify-content: center;align-items: center;flex-direction: row;">
-                        <Icon name="streamline:interface-logout-circle-arrow-enter-right-logout-point-circle"
-                            color="#FC4A6C" size="20" />
-                    </div>
-                    <span class="ml-4">ອອກຈາກລະບົບ</span>
-                </div>
-                <div v-else style="width: 100%;display: flex;flex-direction: row;justify-content: start;align-items: center;border-radius: 5px;cursor: pointer;"
-                    class="pa-2" @mouseover="acitve = true" >
-                    <div
-                        style="width: 45px;height: 45px;border-radius: 50px;background-color: #FFEAED;display: flex;justify-content: center;align-items: center;flex-direction: row;">
-                        <Icon name="streamline:interface-logout-circle-arrow-enter-right-logout-point-circle"
-                            color="#FC4A6C" size="20" />
-                    </div>
-                    <span class="ml-4">ອອກຈາກລະບົບ</span>
-                </div>
-                
             </v-card>
+            <!-- <div style="height: 15px;"></div> -->
+            <div style="width: 100%;background-color: #243B7A;height: 50px;" class="mt-4">
+                <v-card width="1200" color="#243B7A" class="mx-auto" elevation="0">
+                    <div class="d-flex align-center">
+                        <v-btn height="42">ໜ້າຫຼັກ</v-btn>
+                        <v-divider vertical color="white"></v-divider>
+                        <v-btn height="42">ລາຍງານ</v-btn>
+                        <v-divider vertical color="white"></v-divider>
+                    </div>
+                </v-card>
+            </div>
 
-        </v-menu>
+        </div>
+
+
     </v-app-bar>
 </template>
 <script setup lang="ts">
