@@ -36,13 +36,7 @@ const sidebarMenu = ref(sidebarItems);
             </v-list-item-title>
         </v-list-item>
       </template>
-      <div style="position: fixed;bottom: 0%;width: 100%;background-color: white;">
-        <v-divider></v-divider>
-        <v-btn elevation="0" rounded color="#860002"  class="ma-4" style="width: 88%;">
-          <Icon name="uiw:logout" color="#fff" size="20" />
-          <span v-if="!customizer.mini_sidebar" class="ml-2">ອອກຈາກລະບົບ</span>
-        </v-btn>
-      </div>
+      
     </v-list>
   </v-navigation-drawer>
 </template>

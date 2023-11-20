@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <Header />
-        <Drawer />
+        <!-- <Drawer /> -->
         <v-main style="background-color: #EDF5F9;">
             <div class="pa-10">
                 <slot></slot>

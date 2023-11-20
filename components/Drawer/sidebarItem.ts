@@ -29,13 +29,6 @@ export default [
       icon: "carbon:service-id",
       to: "/users",
     },
-    // {
-    //   divider:'divider'
-    // },
-    
-    // {
-    //   divider:'divider'
-    // },
   
   ];
   
