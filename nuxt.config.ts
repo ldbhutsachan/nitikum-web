@@ -1,3 +1,5 @@
+import auth from "./middleware/auth";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -30,7 +32,8 @@ export default defineNuxtConfig({
         },
         //},
         // middleware: ['auth'],
-    },
+      },
+    // middleware:'auth'
 },
   imports: {
     dirs: ['./stores'],

@@ -1,0 +1,62 @@
+export const mangeBasicInfo = [
+    {
+        title:'ຂໍ້ມູນສາຂາ',
+        to:'/'
+    },
+    {
+        title:'ຂໍ້ມູນຝ່າຍ',
+        to:'/'
+    },
+    {
+        title:'ຂໍ້ມູນຂະແໜງ',
+        to:'/'
+    },
+    {
+        title:'ຂໍ້ມູນສິດທິເຂົ້າໃຊ້',
+        to:'/'
+    },
+    {
+        title:'ຂໍ້ມູນຜູ້ເຂົ້າໃຊ້',
+        to:'/'
+    }
+]
+export const mangeDocumentInfo = [
+    {
+        title:'ຂໍ້ມູນປະເພດເອກະສານ',
+        to:'/'
+    },
+    {
+        title:'ບັນທຶກຂໍ້ມູນເອກະສານ',
+        to:'/'
+    },
+    {
+        title:'ລາຍການລໍຖ້າອະນຸມັດ',
+        to:'/'
+    }
+]
+export const mangeWaitApproveInfo = [
+    {
+        title:'ລາຍການ',
+        to:'/'
+    },
+]
+export const itemWaitContunue = [
+    {
+        title:'ຈັດການລາຍການລໍຖ້າດຳເນີນງານ',
+        to:'/'
+    },
+    {
+        title:'ສະຖານະດຳເນີນງານ',
+        to:'/'
+    },
+]
+export const reports = [
+    {
+        title:'ລາຍງານສະຖານະເອກະສານ',
+        to:'/'
+    },
+    {
+        title:'ລາຍງານສະຖານະການດຳເນີນການເອກະສານ',
+        to:'/'
+    },
+]
