@@ -18,7 +18,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
 		API_URL: process.env.baseURL,
     API_KEY: 'ldb-key-x',
-    public:{}
+    public:{
+      API_URL: process.env.baseURL
+    }
 	},
   routeRules: {
     '/api/**': {

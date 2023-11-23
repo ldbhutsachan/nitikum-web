@@ -1,11 +1,11 @@
 export const mangeBasicInfo = [
     {
         title:'ຂໍ້ມູນສາຂາ',
-        to:'/'
+        to:'/document-type'
     },
     {
         title:'ຂໍ້ມູນຝ່າຍ',
-        to:'/'
+        to:'/department'
     },
     {
         title:'ຂໍ້ມູນຂະແໜງ',
