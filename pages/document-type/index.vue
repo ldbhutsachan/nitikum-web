@@ -43,7 +43,7 @@
                         <td>{{ item.brType }}</td>
                         <td>{{ item.underBr }}</td>
                         <td>
-                            <v-btn density="comfortable" variant="text">
+                            <v-btn @click="onGetUpdateDataForUp(item.id,item.branchCode,item.brName,item.brNameLa,item.location,item.brType,item.underBr)" density="comfortable" variant="text">
                                 <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
                             </v-btn>
                             <v-btn density="comfortable" variant="text" @click="onDelete(item.id)">
@@ -56,15 +56,15 @@
                 </tbody>
             </v-table>
             <!-- <span>{{ startPage }}======{{ setBranchList?.resData?.length }}=====</span>
-            <span>{{ endPage }}</span>
-            <div class="d-flex">
+            <span>{{ endPage }}</span> -->
+            <!-- <div class="d-flex">
                 <div style="width: 50%;"></div>
                 <div style="width: 50%;">
                     <v-pagination v-model="page" :length="setBranchList?.resData?.length" rounded="circle"></v-pagination>
                 </div>
             </div> -->
         </v-card>
-        <v-dialog max-width="500" v-model="showDialogAddbranch">
+        <v-dialog max-width="500" v-model="showDialogAddbranch" persistent>
             <v-card>
                 <v-card-title>ເພີ່ມສາຂາ</v-card-title>
                 <v-divider></v-divider>
@@ -76,10 +76,30 @@
                     <v-text-field v-model="branchFormCreate.brType" label="ປະເພດສາຂາ"></v-text-field>
                     <v-text-field v-model="branchFormCreate.underBr" label="ຂຶ້ນກັບສາຂາ"></v-text-field>
                 </v-card-text>
+                
                 <div class="d-flex pa-4">
                     <v-spacer></v-spacer>
                     <v-btn @click="showDialogAddbranch = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
                     <v-btn @click="onSaveBranch" color="#243B7A">ບັນທຶກ</v-btn>
+                </div>
+            </v-card>
+        </v-dialog>
+        <v-dialog max-width="500" v-model="showDialogUpdatebranch">
+            <v-card>
+                <v-card-title>ແກ້ໄຂຂໍ້ມູນສາຂາ</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text class="pt-8">
+                    <!-- <v-text-field v-model="branchFormUpdate.branchCode" label="ລະຫັດສາຂາ"></v-text-field> -->
+                    <v-text-field v-model="branchFormUpdate.brName" label="ຊື່ສາຂາພາສາອັງກິດ"></v-text-field>
+                    <v-text-field v-model="branchFormUpdate.brNameLa" label="ຊື່ສາຂາພາສາລາວ"></v-text-field>
+                    <v-text-field v-model="branchFormUpdate.location" label="ສະຖານທີ່"></v-text-field>
+                    <v-text-field v-model="branchFormUpdate.brType" label="ປະເພດສາຂາ"></v-text-field>
+                    <v-text-field v-model="branchFormUpdate.underBr" label="ຂຶ້ນກັບສາຂາ"></v-text-field>
+                </v-card-text>
+                <div class="d-flex pa-4">
+                    <v-spacer></v-spacer>
+                    <v-btn @click="showDialogUpdatebranch = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
+                    <v-btn @click="onUpdateBranch" color="#243B7A">ແກ້ໄຂ</v-btn>
                 </div>
             </v-card>
         </v-dialog>
@@ -92,19 +112,32 @@ const api = useRuntimeConfig()
 import swal from 'sweetalert2'
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
-import { type BranchModel } from '~/models/BranchModels'
+import { type BranchModel } from '~/models/branchModels'
 import axios from 'axios';
 // state management
 const active = ref<string>('')
 const showDialogAddbranch = ref<boolean>(false)
+const showDialogUpdatebranch = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
 const setBranchList = ref<BranchModel>()
 const page = ref<number>()
 const startPage = ref<number>(0)
 const endPage = ref<number>(10)
-// functions
+// form data
 const branchFormCreate = ref({
+    branchCode: '',
+    brName: '',
+    brNameLa: '',
+    location: '',
+    brType: '',
+    underBr: '',
+})
+const getBranchListForm = ref({
+    branchCode: ''
+})
+const branchFormUpdate = ref({
+    id:'',
     branchCode: '',
     brName: '',
     brNameLa: '',
@@ -112,6 +145,9 @@ const branchFormCreate = ref({
     brType: '',
     underBr: ''
 })
+
+
+// functions
 const onSaveBranch = async () => {
     showLoading.value = true
     const { data } = await useServer('Branch/create', {
@@ -140,7 +176,7 @@ const onSaveBranch = async () => {
 const deleteForm = ref({
     id:''
 })
-const onDelete = async (key:any) =>{
+const onDelete = async (key:any,) =>{
     deleteForm.value.id = key
     const { data } = await useServer('Branch/delete', {
         method: 'POST',
@@ -148,9 +184,6 @@ const onDelete = async (key:any) =>{
     })
     onGetBranchList()
 }
-const getBranchListForm = ref({
-    branchCode: ''
-})
 const onGetBranchList = async () => {
     showLoading.value = true
     const { data } = await useServer('Branch/get-list', {
@@ -158,18 +191,49 @@ const onGetBranchList = async () => {
         body: JSON.stringify(getBranchListForm.value)
     })
     const res: any = data.value
+
     setBranchList.value = res as BranchModel
     showLoading.value = false
     // let data = {
     //     branchCode:''
     // }
-    // await axios.post(`${api.public.API_URL}Branch/getBranchList`,data).then((data)=>{
-    //     console.log(data)
+    //  await axios.post(`${api.public.API_URL}/Branch/getBranchList`,data).then((data)=>{
+    //     console.log("=-=-=-",data?.data?.resData)
+    //     const dataList:any = data?.data?.resData
+    //     setBranchList.value = dataList as BranchModel
+    //     showLoading.value = false
+    //     // const res: any = data.value
     // })
-    // console.log(api.public.API_URL)
-    // await axios.post(`${api.public.API_URL}/Branch/getBranchList`,data).then((data)=>{
-    //     console.log(data)
-    // })
+}
+const onGetUpdateDataForUp = (id:any,branchCode:any,brName:any,brNameLa:any,location:any,brType:any,underBr:any) =>{
+    branchFormUpdate.value.id = id
+    branchFormUpdate.value.branchCode = branchCode
+    branchFormUpdate.value.brName = brName
+    branchFormUpdate.value.brNameLa = brNameLa
+    branchFormUpdate.value.location = location
+    branchFormUpdate.value.brType = brType
+    branchFormUpdate.value.underBr = underBr
+    showDialogUpdatebranch.value = true
+}
+const onUpdateBranch = async () => {
+    showLoading.value = true
+    const { data } = await useServer('Branch/update', {
+        method: 'POST',
+        body: JSON.stringify(branchFormUpdate.value)
+    })
+    const res: any = data.value
+    if (res?.message?.resCode === '00') {
+        showDialogUpdatebranch.value = false
+        onGetBranchList()
+        showSuccess.value = true
+    } else {
+        console.log(res)
+        swal.fire({
+            icon: 'error',
+            text: res?.message?.resMgs
+        })
+        showLoading.value = false
+    }
 }
 watch(page, () => {
     if (page.value !== 0) {
