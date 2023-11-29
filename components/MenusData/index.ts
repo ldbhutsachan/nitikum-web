@@ -1,7 +1,7 @@
 export const mangeBasicInfo = [
     {
         title:'ຂໍ້ມູນສາຂາ',
-        to:'/document-type'
+        to:'/branch'
     },
     {
         title:'ຂໍ້ມູນຝ່າຍ',
@@ -9,7 +9,7 @@ export const mangeBasicInfo = [
     },
     {
         title:'ຂໍ້ມູນຂະແໜງ',
-        to:'/'
+        to:'/section'
     },
     {
         title:'ຂໍ້ມູນສິດທິເຂົ້າໃຊ້',

@@ -33,7 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in setBranchList?.resData" :key="index"
+                    <tr v-for="(item, index) in branchList?.resData" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
                         <td style="height: 10;">{{ item.branchCode }}</td>
@@ -114,13 +114,18 @@ import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 import { type BranchModel } from '~/models/branchModels'
 import axios from 'axios';
+// store state
+import { useManageState } from '~/stores/manage-state'
+const manageState = useManageState()
+const { setBranchList } = manageState
+const branchList = computed(()=>{ return manageState.branchList as BranchModel })
 // state management
 const active = ref<string>('')
 const showDialogAddbranch = ref<boolean>(false)
 const showDialogUpdatebranch = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
-const setBranchList = ref<BranchModel>()
+// const setBranchList = ref<BranchModel>()
 const page = ref<number>()
 const startPage = ref<number>(0)
 const endPage = ref<number>(10)
@@ -185,25 +190,16 @@ const onDelete = async (key:any,) =>{
     onGetBranchList()
 }
 const onGetBranchList = async () => {
-    showLoading.value = true
+    if(!branchList.value){
+        showLoading.value = true
+    }
     const { data } = await useServer('Branch/get-list', {
         method: 'POST',
         body: JSON.stringify(getBranchListForm.value)
     })
     const res: any = data.value
-
-    setBranchList.value = res as BranchModel
+    setBranchList(res)
     showLoading.value = false
-    // let data = {
-    //     branchCode:''
-    // }
-    //  await axios.post(`${api.public.API_URL}/Branch/getBranchList`,data).then((data)=>{
-    //     console.log("=-=-=-",data?.data?.resData)
-    //     const dataList:any = data?.data?.resData
-    //     setBranchList.value = dataList as BranchModel
-    //     showLoading.value = false
-    //     // const res: any = data.value
-    // })
 }
 const onGetUpdateDataForUp = (id:any,branchCode:any,brName:any,brNameLa:any,location:any,brType:any,underBr:any) =>{
     branchFormUpdate.value.id = id
