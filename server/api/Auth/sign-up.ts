@@ -3,7 +3,9 @@ export default defineEventHandler(async (event) => {
     try {
         const config = useRuntimeConfig();
         const body: any = await readBody(event);
-        const { data } = await axios.post(`${config.API_URL}/Section/SaveSection`, body);
+        console.log(body)
+        const { data } = await axios.post(`${config.API_URL}/Auth/Signup`, body);
+        console.log(data)
         return data;
 
     } catch (error: any) {

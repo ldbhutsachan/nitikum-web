@@ -3,8 +3,8 @@
             <v-card width="500" class="mx-auto" rounded="lg" elevation="10" style="background-color: rgba(12,13,14, .1);opacity: 0.9;">
                 <div class="text-center pt-10 text-white" style="font-size: 20pt;font-weight: bold;"><span style="" class="px-2">ເຂົ້າສູ່ລະບົບ</span></div>
                 <div class="pa-10">
-                    <v-text-field v-model="loginForm.userName" label="Username" color="white" filter="red" bg-color="#243B7A" style="font-weight: bold;" ></v-text-field>
-                    <v-text-field v-model="loginForm.passWord" label="Password" color="white" bg-color="#243B7A" style="font-weight: bold;" append-inner-icon="mdi-eye"></v-text-field>
+                    <v-text-field v-model="loginForm.userName" label="Username" color="black" filter="red" bg-color="#fff" style="font-weight: bold;" ></v-text-field>
+                    <v-text-field v-model="loginForm.passWord" label="Password" color="black" bg-color="#fff" style="font-weight: bold;" append-inner-icon="mdi-eye"></v-text-field>
                     <div class="d-flex">
                         <v-spacer></v-spacer>
                         <v-btn @click="onLogin" height="45" rounded color="#243B7A"><Icon name="circum:login" size="30" />ເຂົ້າສູ່ລະບົບ</v-btn>

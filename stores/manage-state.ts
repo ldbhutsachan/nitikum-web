@@ -5,7 +5,8 @@ export const useManageState = defineStore({
   state: (): any => ({
     departmentList: [],
     branchList:[],
-    sectionList:[]
+    sectionList:[],
+    userTypeList:[]
   }),
   actions: {
     setDeparmentList(data:any){
@@ -16,6 +17,9 @@ export const useManageState = defineStore({
     },
     setSectionList(data:any){
       this.sectionList = data
+    },
+    setUserTypeList(data:any){
+      this.userTypeList = data
     },
     setPosts(data: any) {
       this.posts = data

@@ -12,12 +12,8 @@ export const mangeBasicInfo = [
         to:'/section'
     },
     {
-        title:'ຂໍ້ມູນສິດທິເຂົ້າໃຊ້',
-        to:'/'
-    },
-    {
         title:'ຂໍ້ມູນຜູ້ເຂົ້າໃຊ້',
-        to:'/'
+        to:'/users'
     }
 ]
 export const mangeDocumentInfo = [

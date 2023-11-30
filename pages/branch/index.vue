@@ -1,9 +1,11 @@
 <template>
     <div>
-        <v-card width="1200" flat class="mx-auto py-4" style="background-color: #ECF5F8;">
+        <v-card width="1200" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
             <v-btn color="#243B7A" @click="showDialogAddbranch = true">
                 <Icon name="mingcute:plus-line" />ເພີ່ມສາຂາ
             </v-btn>
+            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ branchList?.resData?.length
+            }})</span>
         </v-card>
         <v-card width="1200" class="mx-auto">
             <v-table>
@@ -13,10 +15,7 @@
                             ລະຫັດສາຂາ
                         </th>
                         <th class="text-left text-white">
-                            ຊື່ສາຂາພາສາອັງກິດ
-                        </th>
-                        <th class="text-left text-white">
-                            ຊື່ສາຂາພາສາລາວ
+                            ຊື່ສາຂາ
                         </th>
                         <th class="text-left text-white">
                             ສະຖານທີ
@@ -33,15 +32,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in branchList?.resData" :key="index"
+                    <tr v-for="(item, index) in branchList?.resData?.slice(startPage,endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
                         <td style="height: 10;">{{ item.branchCode }}</td>
-                        <td>{{ item.brName }}</td>
-                        <td>{{ item.brNameLa }}</td>
-                        <td>{{ item.location }}</td>
-                        <td>{{ item.brType }}</td>
-                        <td>{{ item.underBr }}</td>
+                        <td style="font-size: 12pt;"><span style="font-weight: bold;font-size: 12pt;">{{ item.brName }} </span><br /> {{ item.brNameLa }}</td>
+                        <td style="font-size: 12pt;">{{ item.location }}</td>
+                        <td style="font-size: 12pt;">{{ item.brType }}</td>
+                        <td style="font-size: 12pt;">{{ item.underBr }}</td>
                         <td>
                             <v-btn @click="onGetUpdateDataForUp(item.id,item.branchCode,item.brName,item.brNameLa,item.location,item.brType,item.underBr)" density="comfortable" variant="text">
                                 <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
@@ -57,12 +55,12 @@
             </v-table>
             <!-- <span>{{ startPage }}======{{ setBranchList?.resData?.length }}=====</span>
             <span>{{ endPage }}</span> -->
-            <!-- <div class="d-flex">
-                <div style="width: 50%;"></div>
-                <div style="width: 50%;">
-                    <v-pagination v-model="page" :length="setBranchList?.resData?.length" rounded="circle"></v-pagination>
+            <div class="d-flex">
+                <!-- <div style="width: 50%;"></div> -->
+                <div style="width: 100%">
+                    <v-pagination v-model="page" :length="countPage" rounded="circle"></v-pagination>
                 </div>
-            </div> -->
+            </div>
         </v-card>
         <v-dialog max-width="500" v-model="showDialogAddbranch" persistent>
             <v-card>
@@ -126,9 +124,10 @@ const showDialogUpdatebranch = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
 // const setBranchList = ref<BranchModel>()
-const page = ref<number>()
+const page = ref<number>(1)
 const startPage = ref<number>(0)
 const endPage = ref<number>(10)
+const countPage = ref<number>(0)
 // form data
 const branchFormCreate = ref({
     branchCode: '',
@@ -187,7 +186,16 @@ const onDelete = async (key:any,) =>{
         method: 'POST',
         body: JSON.stringify(deleteForm.value)
     })
-    onGetBranchList()
+    const res:any = data.value
+    if(res?.message?.resCode === '00'){
+        showSuccess.value = true
+        onGetBranchList()
+    }else{
+        swal.fire({
+            icon:'error',
+            text: res
+        })
+    }
 }
 const onGetBranchList = async () => {
     if(!branchList.value){
@@ -198,6 +206,14 @@ const onGetBranchList = async () => {
         body: JSON.stringify(getBranchListForm.value)
     })
     const res: any = data.value
+    const count:any = res?.resData?.length
+    const resMath = (count/10).toFixed(1)?.toString()
+    const splitRes = resMath.split('.')
+    if(splitRes[1] === '0'){
+        countPage.value = parseFloat(splitRes[0])
+    }else{
+        countPage.value = parseFloat(splitRes[0])+1
+    }
     setBranchList(res)
     showLoading.value = false
 }
@@ -226,17 +242,14 @@ const onUpdateBranch = async () => {
         console.log(res)
         swal.fire({
             icon: 'error',
-            text: res?.message?.resMgs
+            text: res
         })
         showLoading.value = false
     }
 }
 watch(page, () => {
-    if (page.value !== 0) {
-        startPage.value = startPage.value + 10
-        endPage.value = page.value ? page.value * 10 : 1 * 10
-    }
-
+        startPage.value = (page.value - 1)*10
+        endPage.value = page.value * 10
 })
 onMounted(() => {
     onGetBranchList()

@@ -1,48 +1,47 @@
 <template>
     <div>
-        <v-card width="1200" flat class="mx-auto py-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1200" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn color="#243B7A" @click="showDialogAdd = true">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຝ່າຍ
             </v-btn>
-            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ departmentList?.length }})</span>
+            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ departmentList?.length
+            }})</span>
         </v-card>
         <v-card width="1200" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A">
                         <th class="text-left text-white">
-                            ຊື່ຝ່າຍພາສາອັງກິດ
+                            ລະຫັດ
                         </th>
                         <th class="text-left text-white">
-                            ຊື່ຝ່າຍພາສາລາວ
+                            ຊື່ຝ່າຍ
                         </th>
                         <th class="text-left text-white">
-                            ຊື່ສາຂາພາສາອັງກິດ
-                        </th>
-                        <th class="text-left text-white">
-                            ຊື່ສາຂາພາສາລາວ
+                            ຂຶ້ນກັບສາຂາ
                         </th>
                         <th class="text-left text-white" colspan="2">
                             ຈັດການ
                         </th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in departmentList" :key="index"
+                    <tr v-for="(item, index) in departmentList?.slice(startPage,endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
-                        <td>{{ item?.deptDesc }}</td>
-                        <td>{{ item?.deptLao}}</td>
-                        <td>{{ item?.branchNameEn}}</td>
-                        <td>{{ item?.branchNameLa}}</td>
+                        <td>{{ item?.deptId }}</td>
+                        <td style="font-size: 10pt;"><span style="font-weight: bold;">{{ item?.deptDesc }}</span><br /> {{
+                            item?.deptLao }}</td>
+                        <td style="font-size: 10pt;"><span style="font-weight: bold;">{{ item?.branchNameEn }}</span><br />
+                            {{ item?.branchNameLa }}</td>
                         <td>
                             <v-btn @click="onGetDataForUpdate(
-                                item?.deptId,item?.branchCode,item?.deptDesc,item?.deptLao
+                                item?.deptId, item?.branchCode, item?.deptDesc, item?.deptLao
                             )" density="comfortable" variant="text">
                                 <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
                             </v-btn>
-                            
+
                         </td>
                         <td>
                             <v-btn @click="onDelete(item?.deptId)" density="comfortable" variant="text">
@@ -56,12 +55,12 @@
             </v-table>
             <!-- <span>{{ startPage }}======{{ setBranchList?.resData?.length }}=====</span>
             <span>{{ endPage }}</span> -->
-            <!-- <div class="d-flex">
-                <div style="width: 50%;"></div>
-                <div style="width: 50%;">
-                    <v-pagination v-model="page" :length="setBranchList?.resData?.length" rounded="circle"></v-pagination>
+            <div class="d-flex">
+                
+                <div style="width: 100%;">
+                    <v-pagination v-model="page" :length="countPage" rounded="circle"></v-pagination>
                 </div>
-            </div> -->
+            </div>
         </v-card>
         <v-dialog max-width="500" v-model="showDialogAdd">
             <v-card>
@@ -116,14 +115,18 @@ const branchList: any = ref([])
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
 const showDialogUpdate = ref<boolean>(false)
+const page = ref<number>(1)
+const startPage = ref<number>(0)
+const endPage = ref<number>(10)
+const countPage = ref<number>(0)
 // stores state
 const manageState = useManageState()
 const { setDeparmentList } = manageState
-const departmentList = computed(()=>{ return manageState.departmentList })
+const departmentList = computed(() => { return manageState.departmentList })
 // form data
-const formAdd = ref({deptDesc: '', deptLao: '', branchCode: ''})
-const formUpdate = ref({deptId:'',deptDesc:'', deptLao:'', branchCode:''})
-const formDelete = ref({deptId:''})
+const formAdd = ref({ deptDesc: '', deptLao: '', branchCode: '' })
+const formUpdate = ref({ deptId: '', deptDesc: '', deptLao: '', branchCode: '' })
+const formDelete = ref({ deptId: '' })
 // functions
 const onGetBranchList = async () => {
     let data = {
@@ -148,6 +151,9 @@ const onSave = async () => {
     if (res?.message?.resCode === '00') {
         showLoading.value = false
         showSuccess.value = true
+        formAdd.value.branchCode = ''
+        formAdd.value.deptLao = ''
+        formAdd.value.deptDesc = ''
     } else {
         swal.fire({
             icon: 'error',
@@ -157,7 +163,7 @@ const onSave = async () => {
     }
 }
 const onGetDeptMent = async () => {
-    if(departmentList.value.length===0){
+    if (departmentList.value.length === 0) {
         showLoading.value = true;
     }
     let data = {
@@ -166,6 +172,14 @@ const onGetDeptMent = async () => {
     try {
         await axios.post(`${api.public.API_URL}/Dept/getDeptList`, data).then((data) => {
             setDeparmentList(data?.data?.resData)
+            const count: any = data?.data?.resData?.length
+            const resMath = (count / 10).toFixed(1)?.toString()
+            const splitRes = resMath.split('.')
+            if (splitRes[1] === '0') {
+                countPage.value = parseFloat(splitRes[0])
+            } else {
+                countPage.value = parseFloat(splitRes[0]) + 1
+            }
             showLoading.value = false;
         });
     } catch (error) {
@@ -173,7 +187,7 @@ const onGetDeptMent = async () => {
         showLoading.value = false;
     }
 }
-const onGetDataForUpdate = (deptId:any,branchCode:any,deptDesc:any,deptLao:any) =>{
+const onGetDataForUpdate = (deptId: any, branchCode: any, deptDesc: any, deptLao: any) => {
     formUpdate.value.deptId = deptId
     formUpdate.value.branchCode = branchCode
     formUpdate.value.deptDesc = deptDesc
@@ -200,14 +214,27 @@ const onUpdateDept = async () => {
         showLoading.value = false
     }
 }
-const onDelete = async (key:any,) =>{
+const onDelete = async (key: any,) => {
     formDelete.value.deptId = key
-    await useServer('Dept/delete', {
+    const { data } = await useServer('Dept/delete', {
         method: 'POST',
         body: JSON.stringify(formDelete.value)
     })
-    onGetDeptMent()
+    const res: any = data.value
+    if (res?.message?.resCode === '00') {
+        showSuccess.value = true
+        onGetDeptMent()
+    } else {
+        swal.fire({
+            icon: 'error',
+            text: res
+        })
+    }
 }
+watch(page, () => {
+        startPage.value = (page.value - 1)*10
+        endPage.value = page.value * 10
+})
 onMounted(() => {
     onGetBranchList()
     onGetDeptMent()
