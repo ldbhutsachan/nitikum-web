@@ -195,7 +195,7 @@ const changePassForm = ref({
 const onChangePass = async () => {
     changePassForm.value.oldUserId = userIdNmame.value;
     showLoading.value = true
-    const { data } = await useServer('change-user-pass', {
+    const { data } = await useServer('Auth/change-user-pass', {
         method: 'POST',
         body: JSON.stringify(changePassForm.value)
     })

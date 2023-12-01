@@ -55,7 +55,7 @@
             </v-table>
             <!-- <span>{{ startPage }}======{{ setBranchList?.resData?.length }}=====</span>
             <span>{{ endPage }}</span> -->
-            <div class="d-flex">
+            <div class="d-flex " style="padding-left: 200px;padding-right: 200px;">
                 
                 <div style="width: 100%;">
                     <v-pagination v-model="page" :length="countPage" rounded="circle"></v-pagination>

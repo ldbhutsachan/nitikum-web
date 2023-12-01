@@ -19,11 +19,11 @@ export const mangeBasicInfo = [
 export const mangeDocumentInfo = [
     {
         title:'ຂໍ້ມູນປະເພດເອກະສານ',
-        to:'/'
+        to:'/document-type'
     },
     {
         title:'ບັນທຶກຂໍ້ມູນເອກະສານ',
-        to:'/'
+        to:'/document'
     },
     {
         title:'ລາຍການລໍຖ້າອະນຸມັດ',

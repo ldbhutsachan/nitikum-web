@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
         setCookie(event, 'token', data?.resData[0]?.toKen);
         setCookie(event, 'userId', data?.resData[0]?.userId);
         setCookie(event, 'userName', data?.resData[0]?.userName);
+        setCookie(event, 'status',data?.resData[0]?.userStatus)
         return data;
     } catch (error: any) {
         return error.response.data;

@@ -2,9 +2,9 @@
     <div>
         <v-card width="1200" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn @click="showDialogAdd = true" color="#243B7A">
-                <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນຂະແໜງ
+                <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນປະເພດເອກະສານ
             </v-btn>
-            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ sectiontList?.length
+            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ docTypeList?.length
             }})</span>
         </v-card>
         <v-card width="1200" class="mx-auto">
@@ -12,39 +12,32 @@
                 <thead>
                     <tr style="background-color: #243B7A">
                         <th class="text-left text-white">
-                            ຊື່ຂະແໜງ
+                            ລະຫັດ
                         </th>
                         <th class="text-left text-white">
-                            ຂຶ້ນກັບຝ່າຍ
+                            ຊື່ປະເພດເອກະສານ
                         </th>
                         <th class="text-left text-white" colspan="2">
                             ຈັດການ
                         </th>
-
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in sectiontList?.slice(startPage,endPage)" :key="index"
+                    <tr v-for="(item, index) in docTypeList?.slice(startPage,endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
-                        <td style="font-size: 10pt;"><span style="font-weight: bold;">{{ item?.secDesc }}</span><br />{{ item?.secDescLao }}</td>
-                        <td style="font-size: 10pt;"><span style="font-weight: bold;">{{ item?.deptEN }}</span> <br /> {{ item?.deptLa }}</td>
-                        <!-- <td></td> -->
+                        <td style="font-size: 10pt;">{{ item?.docType }}</td>
+                        <td style="font-size: 10pt;"><span style="font-weight: bold;">{{ item?.docDesc }}</span> <br /> {{ item?.docDescLao }}</td>
                         <td>
-                            <v-btn @click="onGetDataForUpdate(
-                                item?.secId, item?.secCode, item?.secDesc, item?.secDescLao, item?.deptCode
-                            )" density="comfortable" variant="text">
+                            <v-btn @click="onGetDataForUpdate(item?.docType,item?.docDescLao,item?.docDesc)" density="comfortable" variant="text">
                                 <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
                             </v-btn>
-
                         </td>
                         <td>
-                            <v-btn @click="onDelete(item?.secId)" density="comfortable" variant="text">
+                            <v-btn @click="onDelete(item?.docType)" density="comfortable" variant="text">
                                 <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
                             </v-btn>
                         </td>
-
-
                     </tr>
                 </tbody>
             </v-table>
@@ -57,14 +50,11 @@
         </v-card>
         <v-dialog max-width="500" v-model="showDialogAdd">
             <v-card>
-                <v-card-title>ເພີ່ມຂໍ້ມູນຂະແໜງ</v-card-title>
+                <v-card-title>ເພີ່ມຂໍ້ມູນປະເພດເອກະສານ</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text class="pt-8">
-                    <v-text-field label="ລະຫັດຂະແໜງ" v-model="formAdd.secCode"></v-text-field>
-                    <v-text-field label="ຊື່ຂະແໜງພາສາອັງກິດ" v-model="formAdd.secDesc"></v-text-field>
-                    <v-text-field label="ຊື່ຂະແໜງພາສາລາວ" v-model="formAdd.secDescLao"></v-text-field>
-                    <v-select label="ເລືອກຝ່າຍ" v-model="formAdd.deptCode" :items="departmentList" item-title="deptLao"
-                        item-value="deptId"></v-select>
+                    <v-text-field label="ຊື່ປະເພດເອກະສານ(ລາວ)" v-model="formAdd.docDescLao"></v-text-field>
+                    <v-text-field label="ຊື່ປະເພດເອກະສານ(ອັງກິດ)" v-model="formAdd.docDesc"></v-text-field>
                 </v-card-text>
 
                 <div class="d-flex pa-4">
@@ -76,14 +66,11 @@
         </v-dialog>
         <v-dialog max-width="500" v-model="showDialogUpdate">
             <v-card>
-                <v-card-title>ແກ້ໄຂຂໍ້ມູນຂະແໜງ</v-card-title>
+                <v-card-title>ແກ້ໄຂຂໍ້ມູນປະເພດເອກະສານ</v-card-title>
                 <v-divider></v-divider>
                 <v-card-text class="pt-8">
-                    <v-text-field label="ລະຫັດຂະແໜງ" v-model="formUpdate.secCode"></v-text-field>
-                    <v-text-field label="ຊື່ຂະແໜງພາສາອັງກິດ" v-model="formUpdate.secDesc"></v-text-field>
-                    <v-text-field label="ຊື່ຂະແໜງພາສາລາວ" v-model="formUpdate.secDescLao"></v-text-field>
-                    <v-select label="ເລືອກຝ່າຍ" v-model="formUpdate.deptCode" :items="departmentList" item-title="deptLao"
-                        item-value="deptId"></v-select>
+                    <v-text-field label="ຊື່ປະເພດເອກະສານ(ລາວ)" v-model="formUpdate.docDescLao"></v-text-field>
+                    <v-text-field label="ຊື່ປະເພດເອກະສານ(ອັງກິດ)" v-model="formUpdate.docDesc"></v-text-field>
                 </v-card-text>
 
                 <div class="d-flex pa-4">
@@ -98,66 +85,48 @@
     </div>
 </template>
 <script setup lang="ts">
-const api = useRuntimeConfig()
 import axios from 'axios';
-import swal from 'sweetalert2'
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
-
-// stores state
+import Swal from 'sweetalert2';
+const api = useRuntimeConfig()
+const active = ref<string>('')
+//global state
 import { useManageState } from '~/stores/manage-state'
 const manageState = useManageState()
-const { setSectionList, setDeparmentList } = manageState
-const sectiontList = computed(() => { return manageState.sectionList })
-const departmentList = computed(() => { return manageState.departmentList })
+const { setDocumentTypeList } = manageState
+const docTypeList = computed(() => { return manageState.documentTypeList })
 // state
-const active = ref<string>('')
+const showDialogAdd = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
-const showDialogAdd = ref<boolean>(false)
 const showDialogUpdate = ref<boolean>(false)
 const page = ref<number>(1)
 const startPage = ref<number>(0)
 const endPage = ref<number>(10)
 const countPage = ref<number>(0)
 // form data
-const formAdd = ref({
-    secCode: '',
-    secDesc: '',
-    secDescLao: '',
-    deptCode: ''
-})
 const formUpdate = ref({
-    secId: '',
-    secCode: '',
-    secDesc: '',
-    secDescLao: '',
-    deptCode: ''
+    docDesc:'',
+    docDescLao:'',
+    docType:''
+})
+const formAdd = ref({
+    docDesc:'',
+    docDescLao:'',
 })
 const formDelete = ref({
-    secId:''
+    docType:''
 })
-// functions
-const onGetDeptMent = async () => {
-    if (departmentList.value.length === 0) {
-        let data = { deptId: '' }
-        try {
-            await axios.post(`${api.public.API_URL}/Dept/getDeptList`, data).then((data) => {
-                setDeparmentList(data?.data?.resData)
-            });
-        } catch (error) {
-            console.log(error)
-        }
-    }
-}
-const onGetSectionList = async () => {
-    if (sectiontList.value.length === 0) {
+// function
+const onGetDocType = async () => {
+    if (docTypeList.value.length === 0) {
         showLoading.value = true
     }
     let data = { secCode: '' }
     try {
-        await axios.post(`${api.public.API_URL}/Section/getSections`, data).then((data) => {
-            setSectionList(data?.data?.resData)
+        await axios.post(`${api.public.API_URL}/DocumentType/getDocumentType`, data).then((data) => {
+            setDocumentTypeList(data?.data?.resData)
             const count: any = data?.data?.resData?.length
             const resMath = (count / 10).toFixed(1)?.toString()
             const splitRes = resMath.split('.')
@@ -173,42 +142,16 @@ const onGetSectionList = async () => {
         showLoading.value = false
     }
 }
-const onSave = async () => {
-    showLoading.value = true
-    const { data } = await useServer('section/create', {
-        method: 'POST',
-        body: JSON.stringify(formAdd.value)
-    })
-    const res: any = data.value
-    if (res?.message?.resCode === '00') {
-        onGetSectionList()
-        showLoading.value = false
-        showSuccess.value = true
-        formAdd.value.deptCode = ''
-        formAdd.value.secCode = ''
-        formAdd.value.secDesc = ''
-        formAdd.value.secDescLao = ''
-    } else {
-        console.log(res)
-        showLoading.value = false
-        showDialogAdd.value = false
-        swal.fire({
-            icon: 'error',
-            text: 'ລະຫັດຂະແໜງຊໍ້າກັນ, ກະລຸນາປ້ອນໃໝ່'
-        })
-    }
-}
-const onGetDataForUpdate = (secId: any, secCode: any, secDesc: any, secDescLao: any, deptCode: any) => {
-    formUpdate.value.secId = secId
-    formUpdate.value.secCode = secCode
-    formUpdate.value.secDesc = secDesc
-    formUpdate.value.secDescLao = secDescLao
-    formUpdate.value.deptCode = deptCode
+const onGetDataForUpdate = (docType:any,docDescLao:any,docDesc:any) =>{
+    formUpdate.value.docDesc = docDesc
+    formUpdate.value.docDescLao = docDescLao
+    formUpdate.value.docType = docType
     showDialogUpdate.value = true
 }
-const onUpdate = async () => {
+const onUpdate = async () =>{
+    
     showLoading.value = true
-    const { data } = await useServer('section/update', {
+    const { data } = await useServer('doc-type/update', {
         method: 'POST',
         body: JSON.stringify(formUpdate.value)
     })
@@ -217,21 +160,21 @@ const onUpdate = async () => {
         showDialogUpdate.value = false
         showLoading.value = false
         showSuccess.value = true
-        onGetSectionList()
+        
+        onGetDocType()
     } else {
-        console.log(res)
         showLoading.value = false
         showDialogUpdate.value = false
-        swal.fire({
+        Swal.fire({
             icon: 'error',
-            text: 'ລະຫັດຂະແໜງຊໍ້າກັນ, ກະລຸນາປ້ອນໃໝ່'
+            text: res?.message?.resMgs
         })
     }
 }
 const onDelete = async (key:any) =>{
-    formDelete.value.secId = key
+    formDelete.value.docType = key
     showLoading.value = true
-    const { data } = await useServer('section/delete', {
+    const { data } = await useServer('doc-type/delete', {
         method: 'POST',
         body: JSON.stringify(formDelete.value)
     })
@@ -239,13 +182,32 @@ const onDelete = async (key:any) =>{
     if (res?.message?.resCode === '00') {
         showLoading.value = false
         showSuccess.value = true
-        onGetSectionList()
+        onGetDocType()
     } else {
-        console.log(res)
         showLoading.value = false
-        swal.fire({
+        Swal.fire({
             icon: 'error',
-            text: res?.massage?.resMgs
+            text: res?.message?.resMgs
+        })
+    }
+}
+const onSave = async () =>{
+    showLoading.value = true
+    const { data } = await useServer('doc-type/create', {
+        method: 'POST',
+        body: JSON.stringify(formAdd.value)
+    })
+    const res: any = data.value
+    if (res?.message?.resCode === '00') {
+        showLoading.value = false
+        showSuccess.value = true
+        onGetDocType()
+    } else {
+        showLoading.value = false
+        showDialogAdd.value = false
+        Swal.fire({
+            icon: 'error',
+            text: res?.message?.resMgs
         })
     }
 }
@@ -253,8 +215,7 @@ watch(page, () => {
         startPage.value = (page.value - 1)*10
         endPage.value = page.value * 10
 })
-onMounted(() => {
-    onGetDeptMent()
-    onGetSectionList()
+onMounted(()=>{
+    onGetDocType()
 })
 </script>
