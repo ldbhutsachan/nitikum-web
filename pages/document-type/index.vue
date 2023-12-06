@@ -85,11 +85,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import axios from 'axios';
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 import Swal from 'sweetalert2';
-const api = useRuntimeConfig()
 const active = ref<string>('')
 //global state
 import { useManageState } from '~/stores/manage-state'
@@ -118,29 +116,38 @@ const formAdd = ref({
 const formDelete = ref({
     docType:''
 })
+const formGet = ref({ docType:''})
 // function
 const onGetDocType = async () => {
     if (docTypeList.value.length === 0) {
         showLoading.value = true
     }
-    let data = { secCode: '' }
-    try {
-        await axios.post(`${api.public.API_URL}/DocumentType/getDocumentType`, data).then((data) => {
-            setDocumentTypeList(data?.data?.resData)
-            const count: any = data?.data?.resData?.length
-            const resMath = (count / 10).toFixed(1)?.toString()
-            const splitRes = resMath.split('.')
-            if (splitRes[1] === '0') {
-                countPage.value = parseFloat(splitRes[0])
-            } else {
-                countPage.value = parseFloat(splitRes[0]) + 1
-            }
-            showLoading.value = false
-        });
-    } catch (error) {
-        console.log(error)
+    const { data } = await useServer('doc-type/get', {
+        method: 'POST',
+        body: JSON.stringify(formGet.value)
+    })
+    const res: any = data.value
+    if (res?.message?.resCode === '00') {
+        setDocumentTypeList(res?.resData)
+        const count: any = res?.resData?.length
+        const resMath = (count / 10).toFixed(1)?.toString()
+        const splitRes = resMath.split('.')
+        if (splitRes[1] === '0') {
+            countPage.value = parseFloat(splitRes[0])
+        } else {
+            countPage.value = parseFloat(splitRes[0]) + 1
+        }
         showLoading.value = false
+    } else {
+        showLoading.value = false
+        Swal.fire({
+            icon: 'error',
+            text: res?.message?.resMgs
+        })
     }
+}
+if(process.server){
+    await onGetDocType()
 }
 const onGetDataForUpdate = (docType:any,docDescLao:any,docDesc:any) =>{
     formUpdate.value.docDesc = docDesc

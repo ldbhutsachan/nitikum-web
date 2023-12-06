@@ -39,7 +39,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in userList?.slice(startPage,endPage)" :key="index"
+                    <tr v-for="(item, index) in userList?.slice(startPage, endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
                         <td style="height: 10;">{{ item?.userId }}</td>
@@ -51,7 +51,7 @@
                         <td style="font-size: 12pt;">{{ item?.email }}</td>
                         <td>
                             <v-btn @click="onGetDataForUpdate(
-                                item?.id, item?.userId, item?.userName, item?.fullNameEn, item?.fullNameLa, item?.gender, item?.dob, item?.secCode, item?.idtype, item?.tel, item?.email,item?.passWord
+                                item?.id, item?.userId, item?.userName, item?.fullNameEn, item?.fullNameLa, item?.gender, item?.dob, item?.secCode, item?.idtype, item?.tel, item?.email, item?.passWord
                             )" density="comfortable" variant="text">
                                 <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
                             </v-btn>
@@ -65,7 +65,7 @@
                 </tbody>
             </v-table>
             <div class="d-flex" style="padding-left: 200px;padding-right: 200px;">
-                
+
                 <div style="width: 100%;">
                     <v-pagination v-model="page" :length="countPage" rounded="circle"></v-pagination>
                 </div>
@@ -263,30 +263,30 @@ const formUpdate = ref({
     toKen: "000"
 
 })
-const formDelete = ref({id:''})
+const formDelete = ref({ id: '' })
+const formGet = ref({ userType: '', userName: '' })
+const formGetSection = ref({secCode:''})
 // fucntion
 const onGetUserTypeList = async () => {
     if (userTypeList.value.length === 0) {
-        try {
-            await axios.post(`${api.public.API_URL}/UserType/getUserType`).then((data) => {
-                setUserTypeList(data?.data?.resData)
-            });
-        } catch (error) {
-            console.log(error)
-        }
+        const { data } = await useServer('Auth/get', {
+            method: 'POST',
+            body: ''
+        })
+        const res: any = data.value
+        setUserTypeList(res?.resData)
     }
 
 }
+
 const onGetSection = async () => {
     if (sectiontList.value.length === 0) {
-        let data = { secCode: '' }
-        try {
-            await axios.post(`${api.public.API_URL}/Section/getSections`, data).then((data) => {
-                setSectionList(data?.data?.resData)
-            });
-        } catch (error) {
-            console.log(error)
-        }
+        const { data } = await useServer('section/get', {
+            method: 'POST',
+            body: JSON.stringify(formGetSection.value)
+        })
+        const res: any = data.value
+        setSectionList(res?.resData)
     }
 }
 const onSave = async () => {
@@ -320,32 +320,39 @@ const onSave = async () => {
     }
 }
 const onGetUserList = async () => {
+    const userT = useCookie('status')
+    const username = useCookie('userName')
     if (userList.value.length === 0) {
         showLoading.value = true
     }
-    const userT = useCookie('status')
-    const username = useCookie('userName')
-    let data = { userType: userT.value, userName: username.value }
-    try {
-        await axios.post(`${api.public.API_URL}/User/getShowUserInfo`, data).then((data) => {
-            setUserList(data?.data?.resData)
-            const count: any = data?.data?.resData?.length
-            const resMath = (count / 10).toFixed(1)?.toString()
-            const splitRes = resMath.split('.')
-            if (splitRes[1] === '0') {
-                countPage.value = parseFloat(splitRes[0])
-            } else {
-                countPage.value = parseFloat(splitRes[0]) + 1
-            }
-            showLoading.value = false
-        });
-    } catch (error) {
-        console.log(error)
-        // showLoading.value = false
+    formGet.value.userName = username.value ? username.value : ''
+    formGet.value.userType = userT.value ? userT.value : ''
+    const { data } = await useServer('Auth/get-user-list', {
+        method: 'POST',
+        body: JSON.stringify(formGet.value)
+    })
+    const res: any = data.value
+    if (res?.message?.resCode === '00') {
+        setUserList(res?.resData)
+        const count: any = res?.resData?.length
+        const resMath = (count / 10).toFixed(1)?.toString()
+        const splitRes = resMath.split('.')
+        if (splitRes[1] === '0') {
+            countPage.value = parseFloat(splitRes[0])
+        } else {
+            countPage.value = parseFloat(splitRes[0]) + 1
+        }
+        showLoading.value = false
+    } else {
+        showLoading.value = false
+        Swal.fire({
+            icon: 'error',
+            text: res?.message?.resMgs
+        })
     }
 }
 const onGetDataForUpdate = (
-    id: any, userId: any, userName: any, fullNameEn: any, fullNameLa: any, gender: any, dob: any, secCode: any, userType: any, tel: any, email: any,passWord:any
+    id: any, userId: any, userName: any, fullNameEn: any, fullNameLa: any, gender: any, dob: any, secCode: any, userType: any, tel: any, email: any, passWord: any
 ) => {
     formUpdate.value.id = id
     formUpdate.value.userId = userId
@@ -361,29 +368,29 @@ const onGetDataForUpdate = (
     formUpdate.value.passWord = passWord
     showDialogUpdateUser.value = true
 }
-const onUpdate = async () =>{
+const onUpdate = async () => {
     showLoading.value = true
-    
+
     const { data } = await useServer('Auth/update', {
         method: 'POST',
         body: JSON.stringify(formUpdate.value)
     })
     const res: any = data.value
-    
-    if(res?.message?.resCode === '00'){
+
+    if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showDialogUpdateUser.value =false
+        showDialogUpdateUser.value = false
         showSuccess.value = true
         onGetUserList()
-    }else{
+    } else {
         showLoading.value = false
         Swal.fire({
-            icon:'error',
+            icon: 'error',
             text: res?.message?.resMgs
         })
     }
 }
-const onDelete = async (key:any) =>{
+const onDelete = async (key: any) => {
     formDelete.value.id = key
     showLoading.value = true
     const { data } = await useServer('Auth/delete', {
@@ -391,21 +398,26 @@ const onDelete = async (key:any) =>{
         body: JSON.stringify(formDelete.value)
     })
     const res: any = data.value
-    if(res?.message?.resCode === '00'){
+    if (res?.message?.resCode === '00') {
         showLoading.value = false
         showSuccess.value = true
         onGetUserList()
-    }else{
+    } else {
         showLoading.value = false
         Swal.fire({
-            icon:'error',
+            icon: 'error',
             text: res?.message?.resMgs
         })
     }
 }
+if (process.server) {
+    await onGetUserTypeList()
+    await onGetUserList()
+    await onGetSection()
+}
 watch(page, () => {
-        startPage.value = (page.value - 1)*10
-        endPage.value = page.value * 10
+    startPage.value = (page.value - 1) * 10
+    endPage.value = page.value * 10
 })
 onMounted(() => {
     onGetUserTypeList()

@@ -212,10 +212,13 @@ const onGetBranchList = async () => {
     if(splitRes[1] === '0'){
         countPage.value = parseFloat(splitRes[0])
     }else{
-        countPage.value = parseFloat(splitRes[0])+1
+        countPage.value = parseFloat(splitRes[0])+1 
     }
     setBranchList(res)
     showLoading.value = false
+}
+if(process.server){
+    await onGetBranchList()
 }
 const onGetUpdateDataForUp = (id:any,branchCode:any,brName:any,brNameLa:any,location:any,brType:any,underBr:any) =>{
     branchFormUpdate.value.id = id

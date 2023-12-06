@@ -2,10 +2,10 @@ import auth from "./middleware/auth";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devServer:{
-    host:'10.0.28.21',
-    port:3000
-  },
+  // devServer:{
+  //   host:'10.0.28.21',
+  //   port:3000
+  // },
   devtools: { enabled: true },
   ssr: true,
   components: true,
