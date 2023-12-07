@@ -27,7 +27,7 @@ export const mangeDocumentInfo = [
     },
     {
         title:'ລາຍການລໍຖ້າອະນຸມັດ',
-        to:'/'
+        to:'/document/doc-wait-approve'
     }
 ]
 export const mangeWaitApproveInfo = [

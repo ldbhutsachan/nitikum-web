@@ -24,7 +24,7 @@
                         <th class="text-left text-white">
                             ປະເພດເອກະສານ
                         </th>
-                        <th class="text-left text-white">
+                        <!-- <th class="text-left text-white">
                             ຕິດພັນກັບສາຂາ
                         </th>
                         <th class="text-left text-white">
@@ -32,7 +32,7 @@
                         </th>
                         <th class="text-left text-white">
                             ຕິດພັນກັບໃຜ
-                        </th>
+                        </th> -->
                         <th class="text-left text-white">
                             ປະເພດ Share
                         </th>
@@ -41,6 +41,12 @@
                         </th>
                         <th class="text-left text-white">
                             PDF(EN)
+                        </th>
+                        <th class="text-left text-white">
+                            ສະຖານະ
+                        </th>
+                        <th class="text-left text-white">
+                            ຈັດການ
                         </th>
                     </tr>
                 </thead>
@@ -52,21 +58,19 @@
                         <td style="font-size: 12pt;">{{ item?.docNo }} </td>
                         <td style="font-size: 12pt;">{{ item?.docDate }}</td>
                         <td style="font-size: 12pt;">{{ item?.docDescLao }}</td>
+                        <!-- <td style="font-size: 12pt;">{{  }}</td>
                         <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td style="font-size: 12pt;">{{  }}</td> -->
                         <td style="font-size: 12pt;">{{ item?.sharingType }}</td>
                         <td style="font-size: 12pt;">{{  }}</td>
+                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td style="font-size: 12pt;" class="text-red">{{ item?.docStatus }}</td>
                         <td>
-                            <v-btn  density="comfortable" variant="text">
-                                <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
-                            </v-btn>
+                           
                             <v-btn density="comfortable" variant="text">
                                 <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
                             </v-btn>
                         </td>
-
-
                     </tr>
                 </tbody>
             </v-table>
@@ -347,7 +351,8 @@ const onSaveDoc = async () => {
     formData.append('sharingType', formAdd.value.sharingType)
     formData.append('details', formAdd.value.details)
     await axios.post(`${api.public.API_URL}/Document/SaveDoc`, formData).then((data) => {
-        if (data?.data?.resCode === '00') {
+        if (data?.data?.message?.resCode === '00') {
+            onGetInfo()
             showLoading.value = false
             showSuccess.value = true
         }
@@ -372,7 +377,7 @@ const onGetInfo = async () => {
     }else{
         countPage.value = parseFloat(splitRes[0])+1 
     }
-    setDocumentList(res)
+    setDocumentList(res?.resData)
     showLoading.value = false
 }
 if(process.server){

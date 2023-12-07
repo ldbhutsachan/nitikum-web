@@ -28,6 +28,10 @@
             <div style="width: 100%;background-color: #243B7A;" class="mt-6">
                 <v-card width="1200" color="#243B7A" class="mx-auto" elevation="0">
                     <div class="d-flex align-center">
+                        <v-btn color="white"  height="40" to="/">
+                                    ໜ້າຫຼັກ
+                                    <!-- <Icon name="formkit:down" /> -->
+                                </v-btn>
                         <v-divider vertical color="white"></v-divider>
                         <v-menu>
                             <template v-slot:activator="{ props }">
@@ -58,7 +62,7 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-                        <v-divider vertical color="white"></v-divider>
+                        <!-- <v-divider vertical color="white"></v-divider>
                         <v-menu>
                             <template v-slot:activator="{ props }">
                                 <v-btn color="white" v-bind="props" height="40">
@@ -72,7 +76,7 @@
                                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
-                        </v-menu>
+                        </v-menu> -->
                         <v-divider vertical color="white"></v-divider>
                         <v-menu>
                             <template v-slot:activator="{ props }">
