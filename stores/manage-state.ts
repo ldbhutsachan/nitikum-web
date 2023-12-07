@@ -8,7 +8,8 @@ export const useManageState = defineStore({
     sectionList:[],
     userTypeList:[],
     userList:[],
-    documentTypeList:[]
+    documentTypeList:[],
+    documentList:[]
   }),
   actions: {
     setDeparmentList(data:any){
@@ -28,6 +29,9 @@ export const useManageState = defineStore({
     },
     setDocumentTypeList(data:any){
       this.documentTypeList = data
+    },
+    setDocumentList(data:any){
+      this.documentList = data
     },
     setPosts(data: any) {
       this.posts = data

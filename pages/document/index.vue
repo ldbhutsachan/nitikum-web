@@ -1,11 +1,83 @@
 <template>
     <div>
-        <v-card width="1200" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ 10
             }})</span>
+        </v-card>
+
+        <v-card width="1500" class="mx-auto">
+            <v-table>
+                <thead>
+                    <tr style="background-color: #243B7A;">
+                        <th class="text-left text-white">
+                            ຫົວຂໍ້ເອກະສານ
+                        </th>
+                        <th class="text-left text-white">
+                            ເລກທີເອກະສານ
+                        </th>
+                        <th class="text-left text-white">
+                            ລົງວັນທີ
+                        </th>
+                        <th class="text-left text-white">
+                            ປະເພດເອກະສານ
+                        </th>
+                        <th class="text-left text-white">
+                            ຕິດພັນກັບສາຂາ
+                        </th>
+                        <th class="text-left text-white">
+                            ຕິດພັນກັບຂະແໜງ
+                        </th>
+                        <th class="text-left text-white">
+                            ຕິດພັນກັບໃຜ
+                        </th>
+                        <th class="text-left text-white">
+                            ປະເພດ Share
+                        </th>
+                        <th class="text-left text-white">
+                            PDF(LAO)
+                        </th>
+                        <th class="text-left text-white">
+                            PDF(EN)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in documentList" :key="index"
+                        :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
+                        @mouseover="active = index.toString()" @mouseleave="active = ''">
+                        <td style="height: 10;">{{ item?.subjectName}}</td>
+                        <td style="font-size: 12pt;">{{ item?.docNo }} </td>
+                        <td style="font-size: 12pt;">{{ item?.docDate }}</td>
+                        <td style="font-size: 12pt;">{{ item?.docDescLao }}</td>
+                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td style="font-size: 12pt;">{{ item?.sharingType }}</td>
+                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td>
+                            <v-btn  density="comfortable" variant="text">
+                                <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
+                            </v-btn>
+                            <v-btn density="comfortable" variant="text">
+                                <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
+                            </v-btn>
+                        </td>
+
+
+                    </tr>
+                </tbody>
+            </v-table>
+            <!-- <span>{{ startPage }}======{{ setBranchList?.resData?.length }}=====</span>
+            <span>{{ endPage }}</span> -->
+            <div class="d-flex" style="padding-left: 200px;padding-right: 200px;">
+                <!-- <div style="width: 50%;"></div> -->
+                <div style="width: 100%">
+                    <v-pagination v-model="page" :length="countPage" rounded="circle"></v-pagination>
+                </div>
+            </div>
         </v-card>
         <v-dialog max-width="1000" v-model="showDialogAdd" persistent>
             <v-card>
@@ -35,6 +107,7 @@
                         <v-col cols="12" md="6" sm="4">
                             <v-select v-model="branchCode" label="ເອກະສານຕິດພັນກັບສາຂາ" hide-details="auto"
                                 :items="branchList" item-title="brNameLa" item-value="branchCode"></v-select>
+
                         </v-col>
                         <v-col cols="12" md="6" sm="4">
                             <v-select v-model="sectionCode" label="ເອກະສານຕິດພັນກັບຂະແໜງ" hide-details="auto"
@@ -43,8 +116,10 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12" md="6" sm="4">
-                            <v-select multiple chips v-model="userShareList" label="ເອກະສານຕິດພັນກັບໃຜ"
-                                hide-details="auto" :items="userList" item-title="userName" item-value="userId" ></v-select>
+                            <v-select multiple chips v-model="userShareList" label="ເອກະສານຕິດພັນກັບໃຜ" hide-details="auto"
+                                :items="userList" item-title="userName" item-value="userId"></v-select>
+                            <!-- <v-btn @click="showDialogChoose = true" color="#f6f6f6" block elevation="1"
+                                height="55">ເລືອກເອກະສານຕິດພັນກັບໃຜ</v-btn> -->
                         </v-col>
                         <v-col cols="12" md="6" sm="4">
                             <v-select v-model="formAdd.sharingType" label="ເລືອກປະເພດ share" hide-details="auto"
@@ -74,6 +149,34 @@
                 </div>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="showDialogChoose" max-width="500" persistent>
+            <v-card>
+                <v-card-title>ເລືອກເອກະສານຕິດພັນກັບໃຜ</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                    <div class="d-flex pb-2">
+                        <input type="checkbox" @change="onPushAll" style="height: 25px;width: 25px;" />
+                        <span style="margin-left: 15px;">ເລືອກທັງໝົດ</span>
+                    </div>
+                    <v-divider></v-divider>
+                    <div v-for="(item, index) in userList"
+                        style="height: 40px;display: flex;justify-content: start;align-items: center;border-bottom: 1px solid #f6f6f6;"
+                        :key="index">
+                        <input type="checkbox" @change="onPushSingleItem(item?.check, index)"
+                            :checked="item?.check === 'true' ? true : false" style="height: 25px;width: 25px;" />
+                        <span style="margin-left: 15px;">{{ item?.userName }}</span>
+                    </div>
+                </v-card-text>
+                <v-card-actions>
+                    {{ userList }}
+                    ===================
+                    {{ userChoosen }}
+                    <v-spacer></v-spacer>
+                    <v-btn @click="showDialogChoose = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
+                    <v-btn color="#243B7A" variant="outlined">ຕົກລົງ</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <loading v-model="showLoading" />
         <success v-model="showSuccess" />
     </div>
@@ -89,17 +192,22 @@ import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 //global state
 import { useManageState } from '~/stores/manage-state'
+import Swal from 'sweetalert2';
 const manageState = useManageState()
-const { setDocumentTypeList, setBranchList, setDeparmentList } = manageState
+const { setDocumentTypeList, setBranchList, setDeparmentList,setDocumentList } = manageState
 const docTypeList = computed(() => { return manageState.documentTypeList })
 const branchList = computed(() => { return manageState.branchList })
 const departmentList = computed(() => { return manageState.departmentList })
+const documentList = computed(()=> {return manageState.documentList})
+// state
+const userChoosen = ref([])
 const userList: any = ref([])
 const branchCode = ref<string>('')
 const sectionCode = ref<string>('')
 const fileEn: any = ref()
 const fileLa: any = ref()
-const userShareList:any = ref(['AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA','AAAAAAAAAAA'])
+const showDialogChoose = ref<boolean>(false)
+const userShareList: any = ref([])
 const shareTypeItems: any = ref([
     {
         title: 'Normal-ອະນຸຍາດໃຫ້ທຸກຄົນເຫັນຂໍ້ມູນ',
@@ -118,6 +226,11 @@ const shareTypeItems: any = ref([
         value: 'P'
     },
 ])
+const page = ref<number>(1)
+const startPage = ref<number>(0)
+const endPage = ref<number>(10)
+const countPage = ref<number>(0)
+    const active = ref<string>('')
 //form data
 const formAdd = ref({
     subjectName: '',
@@ -134,9 +247,30 @@ const formAdd = ref({
     filesEn: '',
     filesLao: ''
 })
+const formGetDoc = ref({
+    markerId:''
+})
 //function
-const chooseUser = (id:any) =>{
-    console.log(id)
+const onPushAll = () => {
+    // userChoosen.value = []
+    if (userList.value.length !== userChoosen.value.length) {
+        for (let i: number = 0; i < userList.value.length; i++) {
+            userList.value[i].check = 'true'
+        }
+        userChoosen.value = userList.value.map((list: any) => {
+            return list?.userId
+        })
+    } else {
+        for (let i: number = 0; i < userList.value.length; i++) {
+            userList.value[i].check = 'false'
+        }
+        userChoosen.value = []
+    }
+}
+const onPushSingleItem = (item: any, index: any) => {
+    // console.log(userChoosen.value.includes(0))
+    // const checkA = userChoosen.value.includes(item)
+    // console.log(checkA)
 }
 const onGetDocType = async () => {
     if (docTypeList.value.length === 0) {
@@ -181,21 +315,24 @@ const onGetUser = async (id: any) => {
     try {
         await axios.post(`${api.public.API_URL}/User/getComboxUser`, data).then((data) => {
             const res: any = data?.data?.resData
-            userList.value = res
+            const push = { 'check': 'false' }
+            userList.value = res?.map((list: any) => {
+                return { ...list, ...push }
+            })
+            // userList.value = res
         });
     } catch (error) {
         console.log(error)
     }
 }
 const onSaveDoc = async () => {
-    const copy = formAdd.value.shareUserById?.join(',')
+    showLoading.value = true
     const userId = useCookie('userId')
     formAdd.value.filesEn = fileEn.value[0]
     formAdd.value.filesLao = fileLa.value[0]
     formAdd.value.related = branchCode.value
     formAdd.value.deptCode = sectionCode.value
     formAdd.value.markerId = userId.value ? userId.value : ''
-    // console.log(formAdd.value)
     const formData = new FormData()
     formData.append('filesEn', formAdd.value.filesEn)
     formData.append('filesLao', formAdd.value.filesLao)
@@ -205,32 +342,41 @@ const onSaveDoc = async () => {
     formData.append('docType', formAdd.value.docType)
     formData.append('related', formAdd.value.related)
     formData.append('deptCode', formAdd.value.deptCode)
-    formData.append('shareUserById', copy)
+    formData.append('shareUserById', userShareList.value.join())
     formData.append('markerId', formAdd.value.markerId)
     formData.append('sharingType', formAdd.value.sharingType)
     formData.append('details', formAdd.value.details)
-    console.log("=-=--", formData)
     await axios.post(`${api.public.API_URL}/Document/SaveDoc`, formData).then((data) => {
-
+        if (data?.data?.resCode === '00') {
+            showLoading.value = false
+            showSuccess.value = true
+        }
     })
-    // showLoading.value = true
-    // const { data } = await useServer('document/create', {
-    //     method: 'POST',
-    //     body: JSON.stringify(formData)
-    // })
-    // const res: any = data.value
-    // if (res?.message?.resCode === '00') {
-    //     showLoading.value = false
-    //     showSuccess.value = true
-    // } else {
-    //     console.log(res)
-    //     showLoading.value = false
-    //     showDialogAdd.value = false
-    //     swal.fire({
-    //         icon: 'error',
-    //         text: res?.message?.resMgs
-    //     })
-    // }
+}
+const onGetInfo = async () => {
+    const userId = useCookie('userId')
+    if(documentList.value.length === 0){
+        showLoading.value = true
+    }
+    formGetDoc.value.markerId = userId.value ? userId.value:''
+    const { data } = await useServer('document/get-audit', {
+        method: 'POST',
+        body: JSON.stringify(formGetDoc.value)
+    })
+    const res: any = data.value
+    const count:any = res?.resData?.length
+    const resMath = (count/10).toFixed(1)?.toString()
+    const splitRes = resMath.split('.')
+    if(splitRes[1] === '0'){
+        countPage.value = parseFloat(splitRes[0])
+    }else{
+        countPage.value = parseFloat(splitRes[0])+1 
+    }
+    setDocumentList(res)
+    showLoading.value = false
+}
+if(process.server){
+    await onGetInfo()
 }
 watch(userShareList, () => {
     const indexItems = userShareList.value.length - 1
@@ -244,9 +390,13 @@ watch(branchCode, () => {
 watch(sectionCode, () => {
     onGetUser(sectionCode.value)
 })
+watch(page, () => {
+    startPage.value = (page.value - 1) * 10
+    endPage.value = page.value * 10
+})
 onMounted(() => {
     onGetDocType()
     onGetBranchList()
-    // onGetDeptMent()
+    onGetInfo()
 })
 </script>
