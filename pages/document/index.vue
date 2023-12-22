@@ -49,12 +49,13 @@
                             ຈັດການ
                         </th>
                     </tr>
+
                 </thead>
                 <tbody>
                     <tr v-for="(item, index) in documentList" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
-                        <td style="height: 10;">{{ item?.subjectName}}</td>
+                        <td style="height: 10;">{{ item?.subjectName }}</td>
                         <td style="font-size: 12pt;">{{ item?.docNo }} </td>
                         <td style="font-size: 12pt;">{{ item?.docDate }}</td>
                         <td style="font-size: 12pt;">{{ item?.docDescLao }}</td>
@@ -62,12 +63,21 @@
                         <td style="font-size: 12pt;">{{  }}</td>
                         <td style="font-size: 12pt;">{{  }}</td> -->
                         <td style="font-size: 12pt;">{{ item?.sharingType }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td>
+                        <td>
+
+                            <a :href="item?.docPathLa" target="_blank">
+                                <v-btn  elevation="0" color="#243A7A">ເບີ່ງ</v-btn>
+                            </a>
+                        </td>
+                        <td style="font-size: 12pt;">
+                            <a :href="item?.docPath" target="_blank">
+                                <v-btn  elevation="0" color="#243A7A">ເບີ່ງ</v-btn>
+                            </a>
+                        </td>
                         <td style="font-size: 12pt;" class="text-red">{{ item?.docStatus }}</td>
                         <td>
-                           
-                            <v-btn density="comfortable" variant="text">
+
+                            <v-btn density="comfortable" variant="text" v-if="item?.docStatus !== 'ອະນຸມັດເເລ້ວ'">
                                 <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
                             </v-btn>
                         </td>
@@ -83,7 +93,7 @@
                 </div>
             </div>
         </v-card>
-        <v-dialog max-width="1000" v-model="showDialogAdd" persistent>
+        <v-dialog max-width="1000" v-model="showDialogAdd" >
             <v-card>
                 <v-card-title>ເພີ່ມຂໍ້ມູນເອກະສານ</v-card-title>
                 <v-divider></v-divider>
@@ -109,14 +119,18 @@
                     </v-row>
                     <v-row>
                         <v-col cols="12" md="6" sm="4">
+                            <v-select v-model="formAdd.sharingType" label="ເລືອກປະເພດ share" hide-details="auto"
+                                :items="shareTypeItems" item-title="title" item-value="value"></v-select>
+                        </v-col>
+                        <v-col cols="12" md="6" sm="4">
                             <v-select v-model="branchCode" label="ເອກະສານຕິດພັນກັບສາຂາ" hide-details="auto"
                                 :items="branchList" item-title="brNameLa" item-value="branchCode"></v-select>
 
                         </v-col>
-                        <v-col cols="12" md="6" sm="4">
+                        <!-- <v-col cols="12" md="6" sm="4">
                             <v-select v-model="sectionCode" label="ເອກະສານຕິດພັນກັບຂະແໜງ" hide-details="auto"
                                 :items="departmentList" item-title="secDescLao" item-value="secCode"></v-select>
-                        </v-col>
+                        </v-col> -->
                     </v-row>
                     <v-row>
                         <v-col cols="12" md="6" sm="4">
@@ -125,10 +139,7 @@
                             <!-- <v-btn @click="showDialogChoose = true" color="#f6f6f6" block elevation="1"
                                 height="55">ເລືອກເອກະສານຕິດພັນກັບໃຜ</v-btn> -->
                         </v-col>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-select v-model="formAdd.sharingType" label="ເລືອກປະເພດ share" hide-details="auto"
-                                :items="shareTypeItems" item-title="title" item-value="value"></v-select>
-                        </v-col>
+                       
 
                     </v-row>
                     <v-row>
@@ -183,6 +194,7 @@
         </v-dialog>
         <loading v-model="showLoading" />
         <success v-model="showSuccess" />
+        <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
     </div>
 </template>
 <script setup lang="ts">
@@ -191,18 +203,21 @@ const api = useRuntimeConfig()
 const showDialogAdd = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
-import swal from 'sweetalert2'
+// alert
+import alert from '~/components/Alerts/alert-box.vue'
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 //global state
 import { useManageState } from '~/stores/manage-state'
-import Swal from 'sweetalert2';
 const manageState = useManageState()
-const { setDocumentTypeList, setBranchList, setDeparmentList,setDocumentList } = manageState
+const { setDocumentTypeList, setBranchList, setDeparmentList, setDocumentList } = manageState
 const docTypeList = computed(() => { return manageState.documentTypeList })
 const branchList = computed(() => { return manageState.branchList })
 const departmentList = computed(() => { return manageState.departmentList })
-const documentList = computed(()=> {return manageState.documentList})
+const documentList = computed(() => { return manageState.documentList })
 // state
 const userChoosen = ref([])
 const userList: any = ref([])
@@ -234,7 +249,7 @@ const page = ref<number>(1)
 const startPage = ref<number>(0)
 const endPage = ref<number>(10)
 const countPage = ref<number>(0)
-    const active = ref<string>('')
+const active = ref<string>('')
 //form data
 const formAdd = ref({
     subjectName: '',
@@ -252,7 +267,7 @@ const formAdd = ref({
     filesLao: ''
 })
 const formGetDoc = ref({
-    markerId:''
+    markerId: ''
 })
 //function
 const onPushAll = () => {
@@ -350,43 +365,48 @@ const onSaveDoc = async () => {
     formData.append('markerId', formAdd.value.markerId)
     formData.append('sharingType', formAdd.value.sharingType)
     formData.append('details', formAdd.value.details)
-    await axios.post(`${api.public.API_URL}/Document/SaveDoc`, formData).then((data) => {
+    await axios.post(`http://10.0.10.49:9001/financial/iadoc/v1/prod/doc/Document/SaveDoc`, formData).then((data) => {
         if (data?.data?.message?.resCode === '00') {
             onGetInfo()
             showLoading.value = false
-            showSuccess.value = true
+            showAlert.value = true
+            iconType.value = 'success'
+            messageAlert.value = data?.data?.message?.resMgs
+        } else {
+            showLoading.value = false
+            showAlert.value = true
+            iconType.value = 'error'
+            messageAlert.value = data?.data?.message?.resMgs
         }
     })
 }
 const onGetInfo = async () => {
     const userId = useCookie('userId')
-    if(documentList.value.length === 0){
+    if (documentList.value.length === 0) {
         showLoading.value = true
     }
-    formGetDoc.value.markerId = userId.value ? userId.value:''
+    formGetDoc.value.markerId = userId.value ? userId.value : ''
     const { data } = await useServer('document/get-audit', {
         method: 'POST',
         body: JSON.stringify(formGetDoc.value)
     })
     const res: any = data.value
-    const count:any = res?.resData?.length
-    const resMath = (count/10).toFixed(1)?.toString()
+    const count: any = res?.resData?.length
+    const resMath = (count / 10).toFixed(1)?.toString()
     const splitRes = resMath.split('.')
-    if(splitRes[1] === '0'){
+    if (splitRes[1] === '0') {
         countPage.value = parseFloat(splitRes[0])
-    }else{
-        countPage.value = parseFloat(splitRes[0])+1 
+    } else {
+        countPage.value = parseFloat(splitRes[0]) + 1
     }
     setDocumentList(res?.resData)
     showLoading.value = false
 }
-if(process.server){
+if (process.server) {
     await onGetInfo()
 }
 watch(userShareList, () => {
     const indexItems = userShareList.value.length - 1
-    // console.log(userShareList.value)
-    // console.log(indexItems)
     console.log(userShareList.value[indexItems])
 })
 watch(branchCode, () => {

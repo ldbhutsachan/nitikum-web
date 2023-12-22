@@ -81,14 +81,18 @@
             </v-card>
         </v-dialog>
         <loading v-model="showLoading" />
-        <success v-model="showSuccess" />
+        <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
     </div>
 </template>
 <script setup lang="ts">
 import loading from '~/components/loading/loading.vue'
-import success from '~/components/Alerts/sucess.vue'
 import Swal from 'sweetalert2';
 const active = ref<string>('')
+// alert
+import alert from '~/components/Alerts/alert-box.vue'
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
 //global state
 import { useManageState } from '~/stores/manage-state'
 const manageState = useManageState()
@@ -97,7 +101,6 @@ const docTypeList = computed(() => { return manageState.documentTypeList })
 // state
 const showDialogAdd = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
-const showSuccess = ref<boolean>(false)
 const showDialogUpdate = ref<boolean>(false)
 const page = ref<number>(1)
 const startPage = ref<number>(0)
@@ -166,16 +169,15 @@ const onUpdate = async () =>{
     if (res?.message?.resCode === '00') {
         showDialogUpdate.value = false
         showLoading.value = false
-        showSuccess.value = true
-        
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetDocType()
     } else {
         showLoading.value = false
-        showDialogUpdate.value = false
-        Swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onDelete = async (key:any) =>{
@@ -188,14 +190,15 @@ const onDelete = async (key:any) =>{
     const res: any = data.value
     if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetDocType()
     } else {
         showLoading.value = false
-        Swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onSave = async () =>{
@@ -207,15 +210,15 @@ const onSave = async () =>{
     const res: any = data.value
     if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetDocType()
     } else {
         showLoading.value = false
-        showDialogAdd.value = false
-        Swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 watch(page, () => {

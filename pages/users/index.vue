@@ -192,6 +192,7 @@
         </v-dialog>
         <loading v-model="showLoading" />
         <success v-model="showSuccess" />
+        <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
     </div>
 </template> 
 <script setup lang="ts">
@@ -200,6 +201,11 @@ import axios from 'axios';
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 import Swal from 'sweetalert2';
+// alert 
+import alert from '~/components/Alerts/alert-box.vue'
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
 // store sate
 import { useManageState } from '~/stores/manage-state'
 const manageState = useManageState()
@@ -301,7 +307,9 @@ const onSave = async () => {
     console.log(res)
     if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         formAdd.value.dob = ''
         formAdd.value.email = ''
         formAdd.value.fullNameEn = ''
@@ -311,12 +319,10 @@ const onSave = async () => {
         formAdd.value.userId = ''
         formAdd.value.userName = ''
     } else {
-        console.log(res)
-        Swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
         showLoading.value = false
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onGetUserList = async () => {
@@ -380,14 +386,15 @@ const onUpdate = async () => {
     if (res?.message?.resCode === '00') {
         showLoading.value = false
         showDialogUpdateUser.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetUserList()
     } else {
         showLoading.value = false
-        Swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onDelete = async (key: any) => {
@@ -400,14 +407,15 @@ const onDelete = async (key: any) => {
     const res: any = data.value
     if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetUserList()
     } else {
         showLoading.value = false
-        Swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 if (process.server) {

@@ -97,16 +97,21 @@
         </v-dialog>
         <loading v-model="showLoading" />
         <success v-model="showSuccess" />
+        <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
     </div>
 </template>
 <script setup lang="ts">
 import swal from 'sweetalert2'
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
-
+// alert 
+import alert from '~/components/Alerts/alert-box.vue'
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
 // stores state
-import { useManageState } from '~/stores/manage-state'
 import Swal from 'sweetalert2';
+import { useManageState } from '~/stores/manage-state'
 const manageState = useManageState()
 const { setSectionList, setDeparmentList } = manageState
 const sectiontList = computed(() => { return manageState.sectionList })
@@ -194,19 +199,18 @@ const onSave = async () => {
     if (res?.message?.resCode === '00') {
         onGetSectionList()
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         formAdd.value.deptCode = ''
         formAdd.value.secCode = ''
         formAdd.value.secDesc = ''
         formAdd.value.secDescLao = ''
     } else {
-        console.log(res)
         showLoading.value = false
-        showDialogAdd.value = false
-        swal.fire({
-            icon: 'error',
-            text: 'ລະຫັດຂະແໜງຊໍ້າກັນ, ກະລຸນາປ້ອນໃໝ່'
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onGetDataForUpdate = (secId: any, secCode: any, secDesc: any, secDescLao: any, deptCode: any) => {
@@ -227,16 +231,16 @@ const onUpdate = async () => {
     if (res?.message?.resCode === '00') {
         showDialogUpdate.value = false
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetSectionList()
     } else {
         console.log(res)
         showLoading.value = false
-        showDialogUpdate.value = false
-        swal.fire({
-            icon: 'error',
-            text: 'ລະຫັດຂະແໜງຊໍ້າກັນ, ກະລຸນາປ້ອນໃໝ່'
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onDelete = async (key: any) => {
@@ -249,15 +253,16 @@ const onDelete = async (key: any) => {
     const res: any = data.value
     if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetSectionList()
     } else {
         console.log(res)
         showLoading.value = false
-        swal.fire({
-            icon: 'error',
-            text: res?.massage?.resMgs
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 watch(page, () => {

@@ -6,7 +6,7 @@
                 <v-card width="1200" color="#191947" class="mx-auto " elevation="0">
                     <div class="d-flex align-center">
                         <div style="display: flex;justify-content: start;align-items: center;">
-                            <img class="mx-auto" src="../../assets/icons/newLogo.jpeg" width="60"
+                            <img class="mx-auto" src="../../assets/icons/newLogo.jpeg" width="70"
                                 style="border-radius: 50px;" />
                             <div class="pl-2" style="line-height: 18px">
                                 <span style="color:#F4D478;font-size: 13pt;">ທະນາຄານພັດທະນາລາວ</span><br />
@@ -21,19 +21,19 @@
                             <span style="font-size: 12pt;font-weight: bold;">Legal Management System</span>
                         </div>
                         <v-spacer></v-spacer>
-                        <img src="../../assets/icons/logo.png" width="60" />
+                        <!-- <img src="../../assets/icons/logo.png" width="60" /> -->
                     </div>
                 </v-card>
             </div>
             <div style="width: 100%;background-color: #243B7A;" class="mt-6">
                 <v-card width="1200" color="#243B7A" class="mx-auto" elevation="0">
                     <div class="d-flex align-center">
-                        <v-btn color="white"  height="40" to="/">
-                                    ໜ້າຫຼັກ
-                                    <!-- <Icon name="formkit:down" /> -->
-                                </v-btn>
+                        <v-btn color="white" height="40" to="/">
+                            ໜ້າຫຼັກ
+                            <!-- <Icon name="formkit:down" /> -->
+                        </v-btn>
                         <v-divider vertical color="white"></v-divider>
-                        <v-menu>
+                        <v-menu v-if="userRole === 'Admin'">
                             <template v-slot:activator="{ props }">
                                 <v-btn color="white" v-bind="props" height="40">
                                     ຈັດການຂໍ້ມູນພື້ນຖານ
@@ -48,7 +48,7 @@
                             </v-list>
                         </v-menu>
                         <v-divider vertical color="white"></v-divider>
-                        <v-menu>
+                        <v-menu v-if="userRole === 'Admin' || userRole === 'Maker'">
                             <template v-slot:activator="{ props }">
                                 <v-btn color="white" v-bind="props" height="40">
                                     ຈັດການຂໍ້ມູນເອກະສານ
@@ -62,6 +62,10 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
+                        <v-btn to="/document/doc-wait-approve" color="white" height="40" v-if="userRole === 'Admin' || userRole === 'Authorizer'">
+                            ລາຍການລໍຖ້າອະນຸມັດ
+                            <!-- <Icon name="formkit:down" /> -->
+                        </v-btn>
                         <!-- <v-divider vertical color="white"></v-divider>
                         <v-menu>
                             <template v-slot:activator="{ props }">
@@ -77,7 +81,7 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu> -->
-                        <v-divider vertical color="white"></v-divider>
+                        <!-- <v-divider vertical color="white"></v-divider>
                         <v-menu>
                             <template v-slot:activator="{ props }">
                                 <v-btn color="white" v-bind="props" height="40">
@@ -91,8 +95,9 @@
                                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
-                        </v-menu>
-                        <v-divider vertical color="white"></v-divider>
+                        </v-menu> -->
+                        <!-- <v-divider vertical color="white"></v-divider>
+                             -->
                         <v-menu>
                             <template v-slot:activator="{ props }">
                                 <v-btn color="white" v-bind="props" height="40">
@@ -219,7 +224,13 @@ const onChangePass = async () => {
         })
     }
 }
+const userRole = ref<string>('')
+const onGetRole = () =>{
+    const role = useCookie('role')
+    userRole.value = role.value ? role.value:''
+}
 onMounted(() => {
+    onGetRole()
     onGetUserInfo()
 })
 </script>

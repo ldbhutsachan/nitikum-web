@@ -98,22 +98,22 @@
             </v-card>
         </v-dialog>
         <loading v-model="showLoading" />
-        <success v-model="showSuccess" />
+        <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
     </div>
 </template>
 <script setup lang="ts">
-import axios from 'axios';
-import swal from 'sweetalert2'
 import loading from '~/components/loading/loading.vue'
-import success from '~/components/Alerts/sucess.vue'
 import { useManageState } from '~/stores/manage-state'
 import Swal from 'sweetalert2';
+import alert from '~/components/Alerts/alert-box.vue'
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
 // state 
 const active = ref<string>('')
 const showDialogAdd = ref<boolean>(false)
 const branchList: any = ref([])
 const showLoading = ref<boolean>(false)
-const showSuccess = ref<boolean>(false)
 const showDialogUpdate = ref<boolean>(false)
 const page = ref<number>(1)
 const startPage = ref<number>(0)
@@ -147,16 +147,18 @@ const onSave = async () => {
     const res: any = data.value
     if (res?.message?.resCode === '00') {
         showLoading.value = false
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         formAdd.value.branchCode = ''
         formAdd.value.deptLao = ''
         formAdd.value.deptDesc = ''
+        onGetDeptMent()
     } else {
-        swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
         showLoading.value = false
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onGetDeptMent = async () => {
@@ -209,13 +211,14 @@ const onUpdateDept = async () => {
         showDialogUpdate.value = false
         showLoading.value = false
         onGetDeptMent()
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
     } else {
-        swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
         showLoading.value = false
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onDelete = async (key: any,) => {
@@ -226,13 +229,14 @@ const onDelete = async (key: any,) => {
     })
     const res: any = data.value
     if (res?.message?.resCode === '00') {
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetDeptMent()
     } else {
-        swal.fire({
-            icon: 'error',
-            text: res
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 watch(page, () => {

@@ -2,10 +2,14 @@ import auth from "./middleware/auth";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // devServer:{
-  //   host:'10.0.28.21',
-  //   port:3000
+  // router:{
+  //   options:{
+
+  //   }
   // },
+  app:{
+    baseURL:'/law-ldb'
+  },
   devtools: { enabled: true },
   ssr: true,
   components: true,
@@ -20,10 +24,11 @@ export default defineNuxtConfig({
   ],
   ],
   runtimeConfig: {
-		API_URL: process.env.baseURL,
+    // API_URL:'http://10.0.4.102:32111/financial/iadoc/v1/prod/doc',
+    API_URL:'http://10.0.10.49:9001/financial/iadoc/v1/prod/doc',
     API_KEY: 'ldb-key-x',
     public:{
-      API_URL: process.env.baseURL
+      API_URL: 'http://10.0.4.102:32111/financial/iadoc/v1/prod/doc'
     }
 	},
   routeRules: {

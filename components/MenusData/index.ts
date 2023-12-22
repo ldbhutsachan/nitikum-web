@@ -25,10 +25,10 @@ export const mangeDocumentInfo = [
         title:'ບັນທຶກຂໍ້ມູນເອກະສານ',
         to:'/document'
     },
-    {
-        title:'ລາຍການລໍຖ້າອະນຸມັດ',
-        to:'/document/doc-wait-approve'
-    }
+    // {
+    //     title:'ລາຍການລໍຖ້າອະນຸມັດ',
+    //     to:'/document/doc-wait-approve'
+    // }
 ]
 export const mangeWaitApproveInfo = [
     {

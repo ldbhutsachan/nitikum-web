@@ -32,16 +32,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in branchList?.resData?.slice(startPage,endPage)" :key="index"
+                    <tr v-for="(item, index) in branchList?.resData?.slice(startPage, endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
                         <td style="height: 10;">{{ item.branchCode }}</td>
-                        <td style="font-size: 12pt;"><span style="font-weight: bold;font-size: 12pt;">{{ item.brName }} </span><br /> {{ item.brNameLa }}</td>
+                        <td style="font-size: 12pt;"><span style="font-weight: bold;font-size: 12pt;">{{ item.brName }}
+                            </span><br /> {{ item.brNameLa }}</td>
                         <td style="font-size: 12pt;">{{ item.location }}</td>
                         <td style="font-size: 12pt;">{{ item.brType }}</td>
                         <td style="font-size: 12pt;">{{ item.underBr }}</td>
                         <td>
-                            <v-btn @click="onGetUpdateDataForUp(item.id,item.branchCode,item.brName,item.brNameLa,item.location,item.brType,item.underBr)" density="comfortable" variant="text">
+                            <v-btn
+                                @click="onGetUpdateDataForUp(item.id, item.branchCode, item.brName, item.brNameLa, item.location, item.brType, item.underBr)"
+                                density="comfortable" variant="text">
                                 <Icon name="iconamoon:edit-light" size="20" />ແກ້ໄຂ
                             </v-btn>
                             <v-btn density="comfortable" variant="text" @click="onDelete(item.id)">
@@ -74,7 +77,7 @@
                     <v-text-field v-model="branchFormCreate.brType" label="ປະເພດສາຂາ"></v-text-field>
                     <v-text-field v-model="branchFormCreate.underBr" label="ຂຶ້ນກັບສາຂາ"></v-text-field>
                 </v-card-text>
-                
+
                 <div class="d-flex pa-4">
                     <v-spacer></v-spacer>
                     <v-btn @click="showDialogAddbranch = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
@@ -96,13 +99,15 @@
                 </v-card-text>
                 <div class="d-flex pa-4">
                     <v-spacer></v-spacer>
-                    <v-btn @click="showDialogUpdatebranch = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
+                    <v-btn @click="showDialogUpdatebranch = false" variant="outlined" color="red"
+                        class="mr-2">ປິດອອກ</v-btn>
                     <v-btn @click="onUpdateBranch" color="#243B7A">ແກ້ໄຂ</v-btn>
                 </div>
             </v-card>
         </v-dialog>
         <loading v-model="showLoading" />
         <success v-model="showSuccess" />
+        <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
     </div>
 </template>
 <script setup lang="ts">
@@ -112,11 +117,16 @@ import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 import { type BranchModel } from '~/models/branchModels'
 import axios from 'axios';
+// alert popup
+import alert from '~/components/Alerts/alert-box.vue'
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
 // store state
 import { useManageState } from '~/stores/manage-state'
 const manageState = useManageState()
 const { setBranchList } = manageState
-const branchList = computed(()=>{ return manageState.branchList as BranchModel })
+const branchList = computed(() => { return manageState.branchList as BranchModel })
 // state management
 const active = ref<string>('')
 const showDialogAddbranch = ref<boolean>(false)
@@ -141,7 +151,7 @@ const getBranchListForm = ref({
     branchCode: ''
 })
 const branchFormUpdate = ref({
-    id:'',
+    id: '',
     branchCode: '',
     brName: '',
     brNameLa: '',
@@ -160,6 +170,7 @@ const onSaveBranch = async () => {
     })
     const res: any = data.value
     if (res?.message?.resCode === '00') {
+        showLoading.value = false
         onGetBranchList()
         branchFormCreate.value.branchCode = ''
         branchFormCreate.value.brName = ''
@@ -167,38 +178,39 @@ const onSaveBranch = async () => {
         branchFormCreate.value.location = ''
         branchFormCreate.value.brType = ''
         branchFormCreate.value.underBr = ''
-        showSuccess.value = true
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
     } else {
-        console.log(res)
-        swal.fire({
-            icon: 'error',
-            text: res?.message?.resMgs
-        })
         showLoading.value = false
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const deleteForm = ref({
-    id:''
+    id: ''
 })
-const onDelete = async (key:any,) =>{
+const onDelete = async (key: any,) => {
     deleteForm.value.id = key
     const { data } = await useServer('Branch/delete', {
         method: 'POST',
         body: JSON.stringify(deleteForm.value)
     })
-    const res:any = data.value
-    if(res?.message?.resCode === '00'){
-        showSuccess.value = true
+    const res: any = data.value
+    if (res?.message?.resCode === '00') {
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
         onGetBranchList()
-    }else{
-        swal.fire({
-            icon:'error',
-            text: res
-        })
+    } else {
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
     }
 }
 const onGetBranchList = async () => {
-    if(!branchList.value){
+    if (!branchList.value) {
         showLoading.value = true
     }
     const { data } = await useServer('Branch/get-list', {
@@ -206,21 +218,21 @@ const onGetBranchList = async () => {
         body: JSON.stringify(getBranchListForm.value)
     })
     const res: any = data.value
-    const count:any = res?.resData?.length
-    const resMath = (count/10).toFixed(1)?.toString()
+    const count: any = res?.resData?.length
+    const resMath = (count / 10).toFixed(1)?.toString()
     const splitRes = resMath.split('.')
-    if(splitRes[1] === '0'){
+    if (splitRes[1] === '0') {
         countPage.value = parseFloat(splitRes[0])
-    }else{
-        countPage.value = parseFloat(splitRes[0])+1 
+    } else {
+        countPage.value = parseFloat(splitRes[0]) + 1
     }
     setBranchList(res)
     showLoading.value = false
 }
-if(process.server){
+if (process.server) {
     await onGetBranchList()
 }
-const onGetUpdateDataForUp = (id:any,branchCode:any,brName:any,brNameLa:any,location:any,brType:any,underBr:any) =>{
+const onGetUpdateDataForUp = (id: any, branchCode: any, brName: any, brNameLa: any, location: any, brType: any, underBr: any) => {
     branchFormUpdate.value.id = id
     branchFormUpdate.value.branchCode = branchCode
     branchFormUpdate.value.brName = brName
@@ -240,19 +252,20 @@ const onUpdateBranch = async () => {
     if (res?.message?.resCode === '00') {
         showDialogUpdatebranch.value = false
         onGetBranchList()
-        showSuccess.value = true
+        showLoading.value = false
+        showAlert.value = true
+        iconType.value = 'success'
+        messageAlert.value = res?.message?.resMgs
     } else {
-        console.log(res)
-        swal.fire({
-            icon: 'error',
-            text: res
-        })
+        showAlert.value = true
+        iconType.value = 'error'
+        messageAlert.value = res?.message?.resMgs
         showLoading.value = false
     }
 }
 watch(page, () => {
-        startPage.value = (page.value - 1)*10
-        endPage.value = page.value * 10
+    startPage.value = (page.value - 1) * 10
+    endPage.value = page.value * 10
 })
 onMounted(() => {
     onGetBranchList()
