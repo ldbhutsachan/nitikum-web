@@ -2,13 +2,8 @@ import auth from "./middleware/auth";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // router:{
-  //   options:{
-
-  //   }
-  // },
   app:{
-    baseURL:'/law-ldb'
+    baseURL:'/financial/law-ldb'
   },
   devtools: { enabled: true },
   ssr: true,
@@ -24,11 +19,11 @@ export default defineNuxtConfig({
   ],
   ],
   runtimeConfig: {
-    // API_URL:'http://10.0.4.102:32111/financial/iadoc/v1/prod/doc',
-    API_URL:'http://10.0.10.49:9001/financial/iadoc/v1/prod/doc',
-    API_KEY: 'ldb-key-x',
+    API_URL:'https://dehome.ldblao.la/financial/iadoc/v1/prod/doc',
+    // API_URL:'http://10.0.10.49:9001/financial/iadoc/v1/prod/doc',
     public:{
-      API_URL: 'http://10.0.4.102:32111/financial/iadoc/v1/prod/doc'
+      API_URL: 'https://dehome.ldblao.la/financial/iadoc/v1/prod/doc'
+      // API_URL: 'http://10.0.10.49:9001/financial/iadoc/v1/prod/doc'
     }
 	},
   routeRules: {
@@ -41,10 +36,7 @@ export default defineNuxtConfig({
             'Access-Control-Expose-Headers': '*',
             'Access-Control-Allow-Credentials': 'true',
         },
-        //},
-        // middleware: ['auth'],
       },
-    // middleware:'auth'
 },
   imports: {
     dirs: ['./stores'],

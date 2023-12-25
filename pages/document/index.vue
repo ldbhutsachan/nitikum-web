@@ -4,7 +4,7 @@
             <v-btn @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
             </v-btn>
-            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ 10
+            <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ documentList?.length
             }})</span>
         </v-card>
 
@@ -24,15 +24,6 @@
                         <th class="text-left text-white">
                             ປະເພດເອກະສານ
                         </th>
-                        <!-- <th class="text-left text-white">
-                            ຕິດພັນກັບສາຂາ
-                        </th>
-                        <th class="text-left text-white">
-                            ຕິດພັນກັບຂະແໜງ
-                        </th>
-                        <th class="text-left text-white">
-                            ຕິດພັນກັບໃຜ
-                        </th> -->
                         <th class="text-left text-white">
                             ປະເພດ Share
                         </th>
@@ -59,24 +50,29 @@
                         <td style="font-size: 12pt;">{{ item?.docNo }} </td>
                         <td style="font-size: 12pt;">{{ item?.docDate }}</td>
                         <td style="font-size: 12pt;">{{ item?.docDescLao }}</td>
-                        <!-- <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td> -->
                         <td style="font-size: 12pt;">{{ item?.sharingType }}</td>
                         <td>
-
-                            <a :href="item?.docPathLa" target="_blank">
-                                <v-btn  elevation="0" color="#243A7A">ເບີ່ງ</v-btn>
+                            <a v-if="item?.docPathLa !== null && item?.docPathLa !== ''" :href="item?.docPathLa"
+                                target="_blank">
+                                <v-btn elevation="0" variant="text">
+                                    <Icon name="vscode-icons:file-type-pdf2" size="30" />
+                                </v-btn>
                             </a>
                         </td>
                         <td style="font-size: 12pt;">
-                            <a :href="item?.docPath" target="_blank">
-                                <v-btn  elevation="0" color="#243A7A">ເບີ່ງ</v-btn>
+                            <a v-if="item?.docPath !== null && item?.docPath !== ''" :href="item?.docPath" target="_blank">
+                                <v-btn elevation="0" variant="text">
+                                    <Icon name="vscode-icons:file-type-pdf2" size="30" />
+                                </v-btn>
                             </a>
                         </td>
-                        <td style="font-size: 12pt;" class="text-red">{{ item?.docStatus }}</td>
+                        <td style="font-size: 12pt;" class="text-green" v-if="item?.docStatus === 'ອະນຸມັດເເລ້ວ'">
+                            <v-btn color="green" density="compact">{{ item?.docStatus }}</v-btn>
+                        </td>
+                        <td style="font-size: 12pt;" class="text-red" v-else>
+                            <v-btn color="red" density="compact">{{ item?.docStatus }}</v-btn>
+                        </td>
                         <td>
-
                             <v-btn density="comfortable" variant="text" v-if="item?.docStatus !== 'ອະນຸມັດເເລ້ວ'">
                                 <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
                             </v-btn>
@@ -84,114 +80,86 @@
                     </tr>
                 </tbody>
             </v-table>
-            <!-- <span>{{ startPage }}======{{ setBranchList?.resData?.length }}=====</span>
-            <span>{{ endPage }}</span> -->
             <div class="d-flex" style="padding-left: 200px;padding-right: 200px;">
-                <!-- <div style="width: 50%;"></div> -->
                 <div style="width: 100%">
                     <v-pagination v-model="page" :length="countPage" rounded="circle"></v-pagination>
                 </div>
             </div>
         </v-card>
-        <v-dialog max-width="1000" v-model="showDialogAdd" >
+        <v-dialog max-width="1000" v-model="showDialogAdd">
             <v-card>
                 <v-card-title>ເພີ່ມຂໍ້ມູນເອກະສານ</v-card-title>
                 <v-divider></v-divider>
-                <v-card-text class="pt-8">
-                    <v-row>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-text-field v-model="formAdd.subjectName" label="ຫົວຂໍ້ເອກະສານ"
-                                hide-details="auto"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-text-field v-model="formAdd.docNo" label="ເລກທີເອກະສານ" hide-details="auto"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-text-field type="date" v-model="formAdd.docDate" label="ເອກະສານລົງວັນທີ"
-                                hide-details="auto"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-select v-model="formAdd.docType" label="ເລືອກປະເພດເອກະສານ" hide-details="auto"
-                                :items="docTypeList" item-title="docDescLao" item-value="docType"></v-select>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-select v-model="formAdd.sharingType" label="ເລືອກປະເພດ share" hide-details="auto"
-                                :items="shareTypeItems" item-title="title" item-value="value"></v-select>
-                        </v-col>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-select v-model="branchCode" label="ເອກະສານຕິດພັນກັບສາຂາ" hide-details="auto"
-                                :items="branchList" item-title="brNameLa" item-value="branchCode"></v-select>
-
-                        </v-col>
-                        <!-- <v-col cols="12" md="6" sm="4">
-                            <v-select v-model="sectionCode" label="ເອກະສານຕິດພັນກັບຂະແໜງ" hide-details="auto"
-                                :items="departmentList" item-title="secDescLao" item-value="secCode"></v-select>
-                        </v-col> -->
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-select multiple chips v-model="userShareList" label="ເອກະສານຕິດພັນກັບໃຜ" hide-details="auto"
-                                :items="userList" item-title="userName" item-value="userId"></v-select>
-                            <!-- <v-btn @click="showDialogChoose = true" color="#f6f6f6" block elevation="1"
-                                height="55">ເລືອກເອກະສານຕິດພັນກັບໃຜ</v-btn> -->
-                        </v-col>
-                       
-
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-file-input v-model="fileEn" label="ໄຟເອກະສານ(ລາວ)" hide-details="auto"></v-file-input>
-                        </v-col>
-                        <v-col cols="12" md="6" sm="4">
-                            <v-file-input v-model="fileLa" label="ໄຟເອກະສານ(ອັງກິດ)" hide-details="auto"></v-file-input>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-textarea v-model="formAdd.details" label="ລາຍລະອຽດ" hide-details="auto"></v-textarea>
-                        </v-col>
-                    </v-row>
-
-                </v-card-text>
-                <div class="d-flex pa-4">
-                    <v-spacer></v-spacer>
-                    <v-btn @click="showDialogAdd = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
-                    <v-btn @click="onSaveDoc" color="#243B7A">ບັນທຶກ</v-btn>
-                </div>
+                <v-form @submit.prevent>
+                    <v-card-text class="pt-8">
+                        <v-row>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-text-field v-model="formAdd.subjectName" label="ຫົວຂໍ້ເອກະສານ"
+                                    hide-details="auto"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-text-field v-model="formAdd.docNo" label="ເລກທີເອກະສານ"
+                                    hide-details="auto"></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-text-field type="date" v-model="formAdd.docDate" label="ເອກະສານລົງວັນທີ"
+                                    hide-details="auto"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-select v-model="formAdd.docType" label="ເລືອກປະເພດເອກະສານ" hide-details="auto"
+                                    :items="docTypeList" item-title="docDescLao" item-value="docType" :rules="[v => !!v || 'ກະລຸນາເລືອກປະເພດເອກະສານ']"></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-select v-model="formAdd.sharingType" label="ເລືອກປະເພດການ Share" hide-details="auto"
+                                    :items="shareTypeItems" item-title="title" item-value="value"
+                                    :rules="[v => !!v || 'ກະລຸນາເລືອກປະເພດການ Share']"></v-select>
+                            </v-col>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-select multiple chips v-model="formAdd.related" label="ເອກະສານຕິດພັນກັບສາຂາ"
+                                    hide-details="auto" :items="branchList" item-title="brNameLa" item-value="branchCode"
+                                    @update:model-value="onGetDeptMent"></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6" sm="4"
+                                v-if="formAdd.sharingType === 'S' || formAdd.sharingType === 'V'">
+                                <v-select multiple chips v-model="formAdd.deptCode" label="ເອກະສານຕິດພັນກັບຝ່າຍ"
+                                    hide-details="auto" :items="departmentList" item-title="secDescLao" item-value="secCode"
+                                    @update:model-value="onGetUser"></v-select>
+                            </v-col>
+                            <v-col cols="12" md="6" sm="4" v-if="formAdd.sharingType === 'V'">
+                                <v-select multiple chips v-model="formAdd.shareUserById" label="ເອກະສານຕິດພັນກັບໃຜ"
+                                    hide-details="auto" :items="userList" item-title="userName"
+                                    item-value="userId"></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-file-input v-model="fileLa" label="ໄຟເອກະສານ(ລາວ)" hide-details="auto"></v-file-input>
+                            </v-col>
+                            <v-col cols="12" md="6" sm="4">
+                                <v-file-input v-model="fileEn" label="ໄຟເອກະສານ(ອັງກິດ)" hide-details="auto"></v-file-input>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-textarea v-model="formAdd.details" label="ລາຍລະອຽດ" hide-details="auto"></v-textarea>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                    <div class="d-flex pa-4">
+                        <v-spacer></v-spacer>
+                        <v-btn @click="showDialogAdd = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
+                        <v-btn type="sumit" @click="onSaveDoc" color="#243B7A">ບັນທຶກ</v-btn>
+                    </div>
+                </v-form>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="showDialogChoose" max-width="500" persistent>
-            <v-card>
-                <v-card-title>ເລືອກເອກະສານຕິດພັນກັບໃຜ</v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                    <div class="d-flex pb-2">
-                        <input type="checkbox" @change="onPushAll" style="height: 25px;width: 25px;" />
-                        <span style="margin-left: 15px;">ເລືອກທັງໝົດ</span>
-                    </div>
-                    <v-divider></v-divider>
-                    <div v-for="(item, index) in userList"
-                        style="height: 40px;display: flex;justify-content: start;align-items: center;border-bottom: 1px solid #f6f6f6;"
-                        :key="index">
-                        <input type="checkbox" @change="onPushSingleItem(item?.check, index)"
-                            :checked="item?.check === 'true' ? true : false" style="height: 25px;width: 25px;" />
-                        <span style="margin-left: 15px;">{{ item?.userName }}</span>
-                    </div>
-                </v-card-text>
-                <v-card-actions>
-                    {{ userList }}
-                    ===================
-                    {{ userChoosen }}
-                    <v-spacer></v-spacer>
-                    <v-btn @click="showDialogChoose = false" variant="outlined" color="red" class="mr-2">ປິດອອກ</v-btn>
-                    <v-btn color="#243B7A" variant="outlined">ຕົກລົງ</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+
         <loading v-model="showLoading" />
         <success v-model="showSuccess" />
         <alert v-model="showAlert" :messageAlert="messageAlert" :iconType="iconType" @click="showAlert = false" />
@@ -223,8 +191,8 @@ const userChoosen = ref([])
 const userList: any = ref([])
 const branchCode = ref<string>('')
 const sectionCode = ref<string>('')
-const fileEn: any = ref()
-const fileLa: any = ref()
+const fileEn: any = ref('')
+const fileLa: any = ref('')
 const showDialogChoose = ref<boolean>(false)
 const userShareList: any = ref([])
 const shareTypeItems: any = ref([
@@ -240,10 +208,10 @@ const shareTypeItems: any = ref([
         title: 'Sepecial-ອະນຸຍາດໃຫ້ສະເພາະບຸກຄົນ',
         value: 'V'
     },
-    {
-        title: 'Private-ເອກະສານສ່ວນຕົວ',
-        value: 'P'
-    },
+    // {
+    //     title: 'Private-ເອກະສານສ່ວນຕົວ',
+    //     value: 'P'
+    // },
 ])
 const page = ref<number>(1)
 const startPage = ref<number>(0)
@@ -251,13 +219,13 @@ const endPage = ref<number>(10)
 const countPage = ref<number>(0)
 const active = ref<string>('')
 //form data
-const formAdd = ref({
+const formAdd: any = ref({
     subjectName: '',
     docNo: '',
     docDate: '',
     docType: '',
-    related: '',
-    deptCode: '',
+    related: [],
+    deptCode: [],
     shareUserById: [],
     markerId: '',
     sharingType: '',
@@ -270,27 +238,7 @@ const formGetDoc = ref({
     markerId: ''
 })
 //function
-const onPushAll = () => {
-    // userChoosen.value = []
-    if (userList.value.length !== userChoosen.value.length) {
-        for (let i: number = 0; i < userList.value.length; i++) {
-            userList.value[i].check = 'true'
-        }
-        userChoosen.value = userList.value.map((list: any) => {
-            return list?.userId
-        })
-    } else {
-        for (let i: number = 0; i < userList.value.length; i++) {
-            userList.value[i].check = 'false'
-        }
-        userChoosen.value = []
-    }
-}
-const onPushSingleItem = (item: any, index: any) => {
-    // console.log(userChoosen.value.includes(0))
-    // const checkA = userChoosen.value.includes(item)
-    // console.log(checkA)
-}
+
 const onGetDocType = async () => {
     if (docTypeList.value.length === 0) {
         let data = { secCode: '' }
@@ -315,9 +263,9 @@ const onGetBranchList = async () => {
         }
     }
 }
-const onGetDeptMent = async (id: any) => {
+const onGetDeptMent = async () => {
     let data = {
-        branchCode: id
+        branchCode: formAdd.value.related
     }
     try {
         await axios.post(`${api.public.API_URL}/Section/getComboxSections`, data).then((data) => {
@@ -327,46 +275,70 @@ const onGetDeptMent = async (id: any) => {
         console.log(error)
     }
 }
-const onGetUser = async (id: any) => {
+const onGetUser = async () => {
     let data = {
-        secCode: id
+        secCode: formAdd.value.deptCode
     }
     try {
         await axios.post(`${api.public.API_URL}/User/getComboxUser`, data).then((data) => {
             const res: any = data?.data?.resData
-            const push = { 'check': 'false' }
-            userList.value = res?.map((list: any) => {
-                return { ...list, ...push }
-            })
-            // userList.value = res
+            userList.value = res
         });
     } catch (error) {
         console.log(error)
     }
 }
 const onSaveDoc = async () => {
+    if (formAdd.value.sharingType === '' || formAdd.value.docType === '') return
+    // return
+    const formData = new FormData()
     showLoading.value = true
     const userId = useCookie('userId')
-    formAdd.value.filesEn = fileEn.value[0]
-    formAdd.value.filesLao = fileLa.value[0]
-    formAdd.value.related = branchCode.value
-    formAdd.value.deptCode = sectionCode.value
+    // console.log(fileEn.value)
+    if (fileEn.value !== '') {
+        formData.append('filesEn', fileEn.value[0])
+        console.log('end pdf')
+    }else{
+        formData.append('filesEn', '')
+        console.log('no end')
+    }
+    if (fileLa.value !== '') {
+        formData.append('filesLao', fileLa.value[0])
+        console.log('lao pdf')
+    }else{
+        formData.append('filesLao', '')
+        console.log('no lao')
+    }
+    console.log('gog')
+    // return
+    // formAdd.value.related = branchCode.value
+    // formAdd.value.deptCode = sectionCode.value
     formAdd.value.markerId = userId.value ? userId.value : ''
-    const formData = new FormData()
-    formData.append('filesEn', formAdd.value.filesEn)
-    formData.append('filesLao', formAdd.value.filesLao)
+    // formData.append('filesEn', formAdd.value.filesEn)
+    // formData.append('filesLao', formAdd.value.filesLao)
     formData.append('docNo', formAdd.value.docNo)
     formData.append('subjectName', formAdd.value.subjectName)
     formData.append('docDate', formAdd.value.docDate)
     formData.append('docType', formAdd.value.docType)
     formData.append('related', formAdd.value.related)
     formData.append('deptCode', formAdd.value.deptCode)
-    formData.append('shareUserById', userShareList.value.join())
+    formData.append('shareUserById', formAdd.value.shareUserById)
     formData.append('markerId', formAdd.value.markerId)
     formData.append('sharingType', formAdd.value.sharingType)
     formData.append('details', formAdd.value.details)
-    await axios.post(`http://10.0.10.49:9001/financial/iadoc/v1/prod/doc/Document/SaveDoc`, formData).then((data) => {
+    await axios.post(`${api.public.API_URL}/Document/SaveDoc`, formData).then((data) => {
         if (data?.data?.message?.resCode === '00') {
+            formAdd.value.subjectName = ''
+            formAdd.value.docNo = ''
+            formAdd.value.docDate = ''
+            formAdd.value.docType = ''
+            formAdd.value.related = []
+            formAdd.value.deptCode = []
+            formAdd.value.shareUserById = []
+            formAdd.value.sharingType = ''
+            formAdd.value.details = ''
+            formAdd.value.filesEn = ''
+            formAdd.value.filesLao = ''
             onGetInfo()
             showLoading.value = false
             showAlert.value = true
@@ -405,16 +377,16 @@ const onGetInfo = async () => {
 if (process.server) {
     await onGetInfo()
 }
-watch(userShareList, () => {
-    const indexItems = userShareList.value.length - 1
-    console.log(userShareList.value[indexItems])
-})
-watch(branchCode, () => {
-    onGetDeptMent(branchCode.value)
-})
-watch(sectionCode, () => {
-    onGetUser(sectionCode.value)
-})
+// watch(userShareList, () => {
+//     const indexItems = userShareList.value.length - 1
+//     console.log(userShareList.value[indexItems])
+// })
+// watch(branchCode, () => {
+//     onGetDeptMent(branchCode.value)
+// })
+// watch(sectionCode, () => {
+//     onGetUser(sectionCode.value)
+// })
 watch(page, () => {
     startPage.value = (page.value - 1) * 10
     endPage.value = page.value * 10

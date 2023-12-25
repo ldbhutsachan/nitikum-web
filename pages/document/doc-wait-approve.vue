@@ -66,13 +66,13 @@
                         <td style="font-size: 12pt;" class="text-red">{{ item?.docStatus }}</td>
                         <td>
 
-                            <a :href="item?.docPathLa" target="_blank">
-                                <v-btn  elevation="0" color="#243A7A">ເບີ່ງ</v-btn>
+                            <a v-if="item?.docPathLa !== '' && item?.docPathLa !== null" :href="item?.docPathLa" target="_blank">
+                                <v-btn  elevation="0" variant="text"><Icon name="vscode-icons:file-type-pdf2" size="30" /></v-btn>
                             </a>
                         </td>
                         <td style="font-size: 12pt;">
-                            <a :href="item?.docPath" target="_blank">
-                                <v-btn  elevation="0" color="#243A7A">ເບີ່ງ</v-btn>
+                            <a v-if="item?.docPath !== '' && item?.docPath !== null" :href="item?.docPath" target="_blank">
+                                <v-btn  elevation="0" variant="text"><Icon name="vscode-icons:file-type-pdf2" size="30" /></v-btn>
                             </a>
                         </td>
                         

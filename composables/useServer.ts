@@ -11,7 +11,7 @@ export function useServer<T>(url: string, options: UseFetchOptions<T> = {}) {
     const config = useRuntimeConfig();
     // console.log("config==",config.API_URL)
     const defaults: UseFetchOptions<T> = {
-        baseURL: '/law-ldb/api/',
+        baseURL: '/financial/law-ldb/api/',
         // cache request
         key: url,
 
