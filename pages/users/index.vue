@@ -221,7 +221,7 @@ const showSuccess = ref<boolean>(false)
 const showDialogUpdateUser = ref<boolean>(false)
 const page = ref<number>(1)
 const startPage = ref<number>(0)
-const endPage = ref<number>(10)
+const endPage = ref<number>(20)
 const countPage = ref<number>(0)
 // form data
 const generItems = ref([
@@ -341,7 +341,7 @@ const onGetUserList = async () => {
     if (res?.message?.resCode === '00') {
         setUserList(res?.resData)
         const count: any = res?.resData?.length
-        const resMath = (count / 10).toFixed(1)?.toString()
+        const resMath = (count / 20).toFixed(1)?.toString()
         const splitRes = resMath.split('.')
         if (splitRes[1] === '0') {
             countPage.value = parseFloat(splitRes[0])
@@ -424,8 +424,8 @@ if (process.server) {
     await onGetSection()
 }
 watch(page, () => {
-    startPage.value = (page.value - 1) * 10
-    endPage.value = page.value * 10
+    startPage.value = (page.value - 1) * 20
+    endPage.value = page.value * 20
 })
 onMounted(() => {
     onGetUserTypeList()

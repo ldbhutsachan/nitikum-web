@@ -14,9 +14,9 @@
                                 <span style="color:#F4D478;font-size: 10pt;">老挝开发银行LDB BANK</span>
                             </div>
                         </div>
-                        <v-spacer></v-spacer>
-                        <div
-                            style="display: flex;flex-direction: column;justify-content: center;align-items: center;line-height: 30px;">
+                        <!-- <v-spacer></v-spacer> -->
+                        <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;line-height: 30px;"
+                            class="pl-10">
                             <span style="font-size: 20pt;">ລະບົບຄຸ້ມຄອງນິຕິກຳ</span>
                             <span style="font-size: 12pt;font-weight: bold;">Legal Management System</span>
                         </div>
@@ -28,7 +28,7 @@
             <div style="width: 100%;background-color: #243B7A;" class="mt-6">
                 <v-card width="1200" color="#243B7A" class="mx-auto" elevation="0">
                     <div class="d-flex align-center">
-                        <v-btn color="white" height="40" to="/">
+                        <v-btn color="white" height="40" to="/home">
                             ໜ້າຫຼັກ
                             <!-- <Icon name="formkit:down" /> -->
                         </v-btn>
@@ -62,7 +62,8 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-                        <v-btn to="/document/doc-wait-approve" color="white" height="40" v-if="userRole === 'Admin' || userRole === 'Authorizer'">
+                        <v-btn to="/document/doc-wait-approve" color="white" height="40"
+                            v-if="userRole === 'Admin' || userRole === 'Authorizer'">
                             ລາຍການລໍຖ້າອະນຸມັດ
                             <!-- <Icon name="formkit:down" /> -->
                         </v-btn>
@@ -177,24 +178,24 @@ import { useCustomizerStore } from "@/stores/customizer";
 import loading from '../loading/loading.vue'
 import { mangeBasicInfo, mangeDocumentInfo, mangeWaitApproveInfo, itemWaitContunue, reports } from "@/components/MenusData"
 const customizer = useCustomizerStore();
-const userName = ref<string>('')
-const userIdNmame = ref<string>('')
+const userName = ref<any>('')
+const userIdNmame = ref<any>('')
 const dialogChangePass = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const onLogout = () => {
-    const authCookie = useCookie('token')
-    const userIdCookie = useCookie('userId')
-    const userNameCookie = useCookie('userName')
-    authCookie.value = null
-    userIdCookie.value = null
-    userNameCookie.value = null
-    navigateTo('/signIn')
+    // const authCookie = useCookie('token')
+    // const userIdCookie = useCookie('userId')
+    // const userNameCookie = useCookie('userName')
+    // authCookie.value = null
+    // userIdCookie.value = null
+    // userNameCookie.value = null
+    navigateTo('/')
 }
 const onGetUserInfo = () => {
-    const userCookie = useCookie('userName')
-    const userId = useCookie('userId')
-    userName.value = userCookie.value ? userCookie.value : 'No data'
-    userIdNmame.value = userId.value ? userId.value : '0'
+    // const userCookie = useCookie('userName')
+    // const userId = useCookie('userId')
+    userName.value = localStorage.getItem('userName') !== null ? localStorage.getItem('userName') :""
+    userIdNmame.value = localStorage.getItem('userId') !== null ? localStorage.getItem('userId') :''
 }
 const changePassForm = ref({
     oldUserId: '',
@@ -225,9 +226,10 @@ const onChangePass = async () => {
     }
 }
 const userRole = ref<string>('')
-const onGetRole = () =>{
-    const role = useCookie('role')
-    userRole.value = role.value ? role.value:''
+const onGetRole = () => {
+    // const role = useCookie('role')
+    const role = localStorage.getItem('role') !== null ? localStorage.getItem('role'):''
+    userRole.value = role ? role : ''
 }
 onMounted(() => {
     onGetRole()

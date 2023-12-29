@@ -1,45 +1,25 @@
-import auth from "./middleware/auth";
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  app:{
-    baseURL:'/financial/law-ldb'
+  app: {
+    baseURL: '/law-ldb'
   },
-  devtools: { enabled: true },
-  ssr: true,
   components: true,
-  css: ["@/assets/fonts/style.css","@mdi/font/css/materialdesignicons.css"],
+  css: ["@/assets/fonts/style.css", "@mdi/font/css/materialdesignicons.css"],
   modules: [
-    '@invictus.codes/nuxt-vuetify','nuxt-icon',
-    [
-      '@pinia/nuxt',
-      {
-          autoImports: ['defineStore', 'acceptHMRUpdate'],
-      },
-  ],
+    '@invictus.codes/nuxt-vuetify', 'nuxt-icon',
+    ['@pinia/nuxt', { autoImports: ['defineStore', 'acceptHMRUpdate'], },],
   ],
   runtimeConfig: {
-    API_URL:'https://dehome.ldblao.la/financial/iadoc/v1/prod/doc',
-    // API_URL:'http://10.0.10.49:9001/financial/iadoc/v1/prod/doc',
-    public:{
-      API_URL: 'https://dehome.ldblao.la/financial/iadoc/v1/prod/doc'
-      // API_URL: 'http://10.0.10.49:9001/financial/iadoc/v1/prod/doc'
+    API_URL: 'https://dehome.ldblao.la/meeting_api/prod/api/v1',
+    // API_URL:'http://10.0.10.49:9001/meeting_api/prod/api/v1',
+    public: {
+      API_URL: 'https://dehome.ldblao.la/meeting_api/prod/api/v1'
+      // API_URL: 'http://10.0.10.49:9001/meeting_api/prod/api/v1'
     }
-	},
-  routeRules: {
-    '/api/**': {
-        cors: true,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-            'Access-Control-Allow-Headers': '*',
-            'Access-Control-Expose-Headers': '*',
-            'Access-Control-Allow-Credentials': 'true',
-        },
-      },
-},
-  imports: {
-    dirs: ['./stores'],
-},
+  },
 
 })
+// LDBVIP01	30-NOV-23 01.50.35.573352000 PM	782	8
+// LDBVIP02	30-NOV-23 01.50.35.573352000 PM	782	9
+// LDBVIP03	30-NOV-23 01.50.35.573352000 PM	782	10
+// LDBVIP04	30-NOV-23 01.50.35.573352000 PM	782

@@ -1,6 +1,6 @@
 <template>
-    <v-dialog v-model="loading" width="80" persistent>
-        <v-card color="#243B7A" rounded="lg" elevation="10" class="pa-2" style="display: flex;justify-content: center;align-items: center;">
+    <v-dialog v-model="loading" width="120" persistent>
+        <v-card color="#243B7A" rounded="lg" height="100" elevation="10" class="pa-2" style="display: flex;justify-content: center;align-items: center;">
             <!-- <v-card-text> -->
                 <v-progress-circular :size="50" color="white" indeterminate></v-progress-circular>
             <!-- </v-card-text> -->

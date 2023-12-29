@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
-            <v-btn @click="showDialogAdd = true" color="#243B7A">
+            <v-btn variant="outlined" @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ documentList?.length
@@ -67,13 +67,25 @@
                             </a>
                         </td>
                         <td style="font-size: 12pt;" class="text-green" v-if="item?.docStatus === 'ອະນຸມັດເເລ້ວ'">
-                            <v-btn color="green" density="compact">{{ item?.docStatus }}</v-btn>
+                            <v-btn color="green" density="compact" class="card-shadow">
+                                <Icon name="simple-line-icons:check" color="white" /> {{ item?.docStatus }}
+                            </v-btn>
                         </td>
-                        <td style="font-size: 12pt;" class="text-red" v-else>
+                        <td style="font-size: 12pt;" class="text-green" v-if="item?.docStatus === 'ລາຍການຖືກປະຕິເສດ'">
+                            <v-btn color="green" density="compact" class="card-shadow">
+                                <Icon name="simple-line-icons:close" color="red" /> {{ item?.docStatus }}
+                            </v-btn>
+                        </td>
+                        <td style="font-size: 12pt;" class="text-green" v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ'">
+                            <v-btn color="green" density="compact" class="card-shadow">
+                                <Icon name="carbon:pending" />{{ item?.docStatus }}
+                            </v-btn>
+                        </td>
+                        <!-- <td style="font-size: 12pt;" class="text-red" v-else>
                             <v-btn color="red" density="compact">{{ item?.docStatus }}</v-btn>
-                        </td>
+                        </td> -->
                         <td>
-                            <v-btn density="comfortable" variant="text" v-if="item?.docStatus !== 'ອະນຸມັດເເລ້ວ'">
+                            <v-btn v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ'" density="comfortable" variant="text">
                                 <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
                             </v-btn>
                         </td>
@@ -109,7 +121,8 @@
                             </v-col>
                             <v-col cols="12" md="6" sm="4">
                                 <v-select v-model="formAdd.docType" label="ເລືອກປະເພດເອກະສານ" hide-details="auto"
-                                    :items="docTypeList" item-title="docDescLao" item-value="docType" :rules="[v => !!v || 'ກະລຸນາເລືອກປະເພດເອກະສານ']"></v-select>
+                                    :items="docTypeList" item-title="docDescLao" item-value="docType"
+                                    :rules="[v => !!v || 'ກະລຸນາເລືອກປະເພດເອກະສານ']"></v-select>
                             </v-col>
                         </v-row>
                         <v-row>
@@ -118,13 +131,13 @@
                                     :items="shareTypeItems" item-title="title" item-value="value"
                                     :rules="[v => !!v || 'ກະລຸນາເລືອກປະເພດການ Share']"></v-select>
                             </v-col>
-                            <v-col cols="12" md="6" sm="4">
+                            <v-col cols="12" md="6" sm="4" v-if="formAdd.sharingType === 'V'">
                                 <v-select multiple chips v-model="formAdd.related" label="ເອກະສານຕິດພັນກັບສາຂາ"
                                     hide-details="auto" :items="branchList" item-title="brNameLa" item-value="branchCode"
                                     @update:model-value="onGetDeptMent"></v-select>
                             </v-col>
                         </v-row>
-                        <v-row>
+                        <!-- <v-row>
                             <v-col cols="12" md="6" sm="4"
                                 v-if="formAdd.sharingType === 'S' || formAdd.sharingType === 'V'">
                                 <v-select multiple chips v-model="formAdd.deptCode" label="ເອກະສານຕິດພັນກັບຝ່າຍ"
@@ -136,7 +149,7 @@
                                     hide-details="auto" :items="userList" item-title="userName"
                                     item-value="userId"></v-select>
                             </v-col>
-                        </v-row>
+                        </v-row> -->
                         <v-row>
                             <v-col cols="12" md="6" sm="4">
                                 <v-file-input v-model="fileLa" label="ໄຟເອກະສານ(ລາວ)" hide-details="auto"></v-file-input>
@@ -200,12 +213,12 @@ const shareTypeItems: any = ref([
         title: 'Normal-ອະນຸຍາດໃຫ້ທຸກຄົນເຫັນຂໍ້ມູນ',
         value: 'N'
     },
+    // {
+    //     title: 'Section-ອະນຸຍາດໃຫ້ຂະເເໜ່ງຂອງຕົນເອງ ແລະ ຄະນະຝ່າຍ',
+    //     value: 'S'
+    // },
     {
-        title: 'Section-ອະນຸຍາດໃຫ້ຂະເເໜ່ງຂອງຕົນເອງ ແລະ ຄະນະຝ່າຍ',
-        value: 'S'
-    },
-    {
-        title: 'Sepecial-ອະນຸຍາດໃຫ້ສະເພາະບຸກຄົນ',
+        title: 'Special-ອະນຸຍາດໃຫ້ສະເພາະບຸກຄົນ',
         value: 'V'
     },
     // {
@@ -215,7 +228,7 @@ const shareTypeItems: any = ref([
 ])
 const page = ref<number>(1)
 const startPage = ref<number>(0)
-const endPage = ref<number>(10)
+const endPage = ref<number>(20)
 const countPage = ref<number>(0)
 const active = ref<string>('')
 //form data
@@ -234,7 +247,7 @@ const formAdd: any = ref({
     filesEn: '',
     filesLao: ''
 })
-const formGetDoc = ref({
+const formGetDoc: any = ref({
     markerId: ''
 })
 //function
@@ -293,27 +306,25 @@ const onSaveDoc = async () => {
     // return
     const formData = new FormData()
     showLoading.value = true
-    const userId = useCookie('userId')
+    // const userId = useCookie('userId')
+    const userId = localStorage.getItem('userId')
+
     // console.log(fileEn.value)
     if (fileEn.value !== '') {
         formData.append('filesEn', fileEn.value[0])
         console.log('end pdf')
-    }else{
+    } else {
         formData.append('filesEn', '')
         console.log('no end')
     }
     if (fileLa.value !== '') {
         formData.append('filesLao', fileLa.value[0])
         console.log('lao pdf')
-    }else{
+    } else {
         formData.append('filesLao', '')
         console.log('no lao')
     }
-    console.log('gog')
-    // return
-    // formAdd.value.related = branchCode.value
-    // formAdd.value.deptCode = sectionCode.value
-    formAdd.value.markerId = userId.value ? userId.value : ''
+    formAdd.value.markerId = userId ? userId : ''
     // formData.append('filesEn', formAdd.value.filesEn)
     // formData.append('filesLao', formAdd.value.filesLao)
     formData.append('docNo', formAdd.value.docNo)
@@ -352,48 +363,47 @@ const onSaveDoc = async () => {
         }
     })
 }
+const locals = ref<any>('')
+const onGetUserInfo = () => {
+    locals.value = localStorage.getItem('userId')
+}
 const onGetInfo = async () => {
-    const userId = useCookie('userId')
+
     if (documentList.value.length === 0) {
         showLoading.value = true
     }
-    formGetDoc.value.markerId = userId.value ? userId.value : ''
-    const { data } = await useServer('document/get-audit', {
-        method: 'POST',
-        body: JSON.stringify(formGetDoc.value)
-    })
-    const res: any = data.value
-    const count: any = res?.resData?.length
-    const resMath = (count / 10).toFixed(1)?.toString()
-    const splitRes = resMath.split('.')
-    if (splitRes[1] === '0') {
-        countPage.value = parseFloat(splitRes[0])
-    } else {
-        countPage.value = parseFloat(splitRes[0]) + 1
+    try {
+        var body = {
+            markerId: localStorage.getItem('userId')
+        }
+        await axios.post(`${api.public.API_URL}/Audit/getWaitListCheckByUser`, body).then((data) => {
+            const count: any = data?.data?.resData
+            const resMath = (count / 20).toFixed(1)?.toString()
+            const splitRes = resMath.split('.')
+            if (splitRes[1] === '0') {
+                countPage.value = parseFloat(splitRes[0])
+                
+            } else {
+                countPage.value = parseFloat(splitRes[0]) + 1
+            }
+            setDocumentList(data?.data?.resData)
+            showLoading.value = false
+        })
+    } catch (error) {
+        console.log(error)
     }
-    setDocumentList(res?.resData)
     showLoading.value = false
 }
-if (process.server) {
-    await onGetInfo()
-}
-// watch(userShareList, () => {
-//     const indexItems = userShareList.value.length - 1
-//     console.log(userShareList.value[indexItems])
-// })
-// watch(branchCode, () => {
-//     onGetDeptMent(branchCode.value)
-// })
-// watch(sectionCode, () => {
-//     onGetUser(sectionCode.value)
-// })
+
+
 watch(page, () => {
-    startPage.value = (page.value - 1) * 10
-    endPage.value = page.value * 10
+    startPage.value = (page.value - 1) * 20
+    endPage.value = page.value * 20
 })
 onMounted(() => {
     onGetDocType()
     onGetBranchList()
     onGetInfo()
+    onGetUserInfo()
 })
 </script>

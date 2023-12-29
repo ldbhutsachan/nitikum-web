@@ -24,15 +24,6 @@
                         <th class="text-left text-white">
                             ປະເພດເອກະສານ
                         </th>
-                        <!-- <th class="text-left text-white">
-                            ຕິດພັນກັບສາຂາ
-                        </th>
-                        <th class="text-left text-white">
-                            ຕິດພັນກັບຂະແໜງ
-                        </th>
-                        <th class="text-left text-white">
-                            ຕິດພັນກັບໃຜ
-                        </th> -->
                         <th class="text-left text-white">
                             ປະເພດ Share
                         </th>
@@ -45,43 +36,55 @@
                         <th class="text-left text-white">
                             PDF(EN)
                         </th>
-                        
-                        <th class="text-left text-white">
+
+                        <th class="text-left text-white" colspan="2">
                             ຈັດການ
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in documentList" :key="index"
+                    <tr v-for="(item, index) in documentList?.slice(startPage, endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
                         <td style="height: 10;">{{ item?.subjectName }}</td>
                         <td style="font-size: 12pt;">{{ item?.docNo }} </td>
                         <td style="font-size: 12pt;">{{ item?.docDate }}</td>
                         <td style="font-size: 12pt;">{{ item?.docDescLao }}</td>
-                        <!-- <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td>
-                        <td style="font-size: 12pt;">{{  }}</td> -->
                         <td style="font-size: 12pt;">{{ item?.sharingType }}</td>
-                        <td style="font-size: 12pt;" class="text-red">{{ item?.docStatus }}</td>
+                        <td v-if="item?.docStatus === 'ອະນຸມັດເເລ້ວ'" style="font-size: 12pt;" class="text-green">
+                            <Icon name="simple-line-icons:check" color="green" /> {{ item?.docStatus }}
+                        </td>
+                        <td v-if="item?.docStatus === 'ລາຍການຖືກປະຕິເສດ'" style="font-size: 12pt;width: 200px;"
+                            class="text-red">
+                            <Icon name="simple-line-icons:close" color="red" /> {{ item?.docStatus }}
+                        </td>
+                        <td v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ'" style="font-size: 12pt;" class="text-red">
+                            <Icon name="carbon:pending" /> {{ item?.docStatus }}
+                        </td>
                         <td>
-
-                            <a v-if="item?.docPathLa !== '' && item?.docPathLa !== null" :href="item?.docPathLa" target="_blank">
-                                <v-btn  elevation="0" variant="text"><Icon name="vscode-icons:file-type-pdf2" size="30" /></v-btn>
+                            <a v-if="item?.docPathLa !== '' && item?.docPathLa !== null" :href="item?.docPathLa"
+                                target="_blank">
+                                <v-btn elevation="0" variant="text">
+                                    <Icon name="vscode-icons:file-type-pdf2" size="30" />
+                                </v-btn>
                             </a>
                         </td>
                         <td style="font-size: 12pt;">
                             <a v-if="item?.docPath !== '' && item?.docPath !== null" :href="item?.docPath" target="_blank">
-                                <v-btn  elevation="0" variant="text"><Icon name="vscode-icons:file-type-pdf2" size="30" /></v-btn>
+                                <v-btn elevation="0" variant="text">
+                                    <Icon name="vscode-icons:file-type-pdf2" size="30" />
+                                </v-btn>
                             </a>
                         </td>
-                        
                         <td>
-
-                            <v-btn v-if="item?.docStatus !== 'ອະນຸມັດເເລ້ວ'" @click="onAskBeforeApprove(item?.id)" density="comfortable" color="#243A7A">
+                            <v-btn v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ' && item?.docStatus !== 'ລາຍການຖືກປະຕິເສດ'"
+                                @click="onAskBeforeApprove(item?.id)" density="comfortable" color="#243A7A">
                                 ອະນຸມັດ
                             </v-btn>
-                            <v-btn v-if="item?.docStatus !== 'ອະນຸມັດເເລ້ວ'" class="ml-2" @click="onAskBeforeReject(item?.id)" density="comfortable" color="red">
+                        </td>
+                        <td>
+                            <v-btn v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ' && item?.docStatus !== 'ລາຍການຖືກປະຕິເສດ'"
+                                class="ml-2" @click="onAskBeforeReject(item?.id)" density="comfortable" color="red">
                                 ປະຕິເສດ
                             </v-btn>
                         </td>
@@ -106,10 +109,8 @@
 <script setup lang="ts">
 import axios from 'axios';
 const api = useRuntimeConfig()
-const showDialogAdd = ref<boolean>(false)
 const showLoading = ref<boolean>(false)
 const showSuccess = ref<boolean>(false)
-import swal from 'sweetalert2'
 import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 import alert from '~/components/Alerts/alert-box.vue'
@@ -127,36 +128,38 @@ const documentList = computed(() => { return manageState.documentList })
 
 const page = ref<number>(1)
 const startPage = ref<number>(0)
-const endPage = ref<number>(10)
+const endPage = ref<number>(20)
 const countPage = ref<number>(0)
 const active = ref<string>('')
 //form data
 
-const formGetDoc = ref({ markerId: '' })
-const formGetWaitApp = ref({ docNo: '' })
-const formApprove = ref({ approveId: '', id: '' })
 
 const onGetInfo = async () => {
-    const userId = useCookie('userId')
     if (documentList.value.length === 0) {
         showLoading.value = true
     }
-    formGetDoc.value.markerId = userId.value ? userId.value : ''
-    const { data } = await useServer('document/get-audit-wait-app', {
-        method: 'POST',
-        body: JSON.stringify(formGetWaitApp.value)
-    })
-    const res: any = data.value
-    const count: any = res?.resData?.length
-    const resMath = (count / 10).toFixed(1)?.toString()
-    const splitRes = resMath.split('.')
-    if (splitRes[1] === '0') {
-        countPage.value = parseFloat(splitRes[0])
-    } else {
-        countPage.value = parseFloat(splitRes[0]) + 1
+    try {
+        var body = {
+            docNo: ''
+        }
+        await axios.post(`${api.public.API_URL}/Audit/getAuditListCheck`, body).then((data) => {
+            const count: any = data?.data?.resData?.length
+            const resMath = (count / 20).toFixed(1)?.toString()
+            const splitRes = resMath.split('.')
+            if (splitRes[1] === '0') {
+                countPage.value = parseFloat(splitRes[0])
+            } else {
+                countPage.value = parseFloat(splitRes[0]) + 1
+            }
+            setDocumentList(data?.data?.resData)
+            showLoading.value = false
+        })
+    } catch (error) {
+        console.log(error)
     }
-    setDocumentList(res?.resData)
-    showLoading.value = false
+
+
+
 }
 const onAskBeforeApprove = (key: any) => {
     Swal.fire({
@@ -175,23 +178,25 @@ const onAskBeforeApprove = (key: any) => {
     })
 }
 const onApprove = async (key: any) => {
-    const userId = useCookie('userId')
-    formApprove.value.id = key
-    formApprove.value.approveId = userId.value ? userId.value : ''
-    const { data } = await useServer('document/approve', {
-        method: 'POST',
-        body: JSON.stringify(formApprove.value)
-    })
-    const res: any = data.value
-    if (res?.message?.resCode === '00') {
-        showAlert.value = true
-        iconType.value = 'success'
-        messageAlert.value = res?.message?.resMgs
-        onGetInfo()
-    } else {
-        showAlert.value = true
-        iconType.value = 'error'
-        messageAlert.value = res?.message?.resMgs
+    try {
+        var body = {
+            approveId: localStorage.getItem('userId'),
+            id: parseFloat(key)
+        }
+        await axios.post(`${api.public.API_URL}/Audit/AuditDoc`, body).then((data) => {
+            if (data?.data.message?.resCode === '00') {
+                showAlert.value = true
+                iconType.value = 'success'
+                messageAlert.value = data?.data?.message?.resMgs
+                onGetInfo()
+            } else {
+                showAlert.value = true
+                iconType.value = 'error'
+                messageAlert.value = data?.data?.message?.resMgs
+            }
+        })
+    } catch (error) {
+        console.log()
     }
 }
 const onAskBeforeReject = (key: any) => {
@@ -211,43 +216,38 @@ const onAskBeforeReject = (key: any) => {
     })
 }
 const onReject = async (key: any) => {
-    const userId = useCookie('userId')
-    formApprove.value.id = key
-    formApprove.value.approveId = userId.value ? userId.value : ''
-    const { data } = await useServer('document/reject', {
-        method: 'POST',
-        body: JSON.stringify(formApprove.value)
-    })
-    const res: any = data.value
-    if (res?.message?.resCode === '00') {
-        showAlert.value = true
-        iconType.value = 'success'
-        messageAlert.value = res?.message?.resMgs
-        onGetInfo()
-    } else {
-        showAlert.value = true
-        iconType.value = 'error'
-        messageAlert.value = res?.message?.resMgs
+    try {
+        showLoading.value = true
+        var body = {
+            approveId: localStorage.getItem('userId'),
+            id: key
+        }
+        await axios.post(`${api.public.API_URL}/Audit/rejectDocument`, body).then((data) => {
+            if (data?.data.message?.resCode === '00') {
+                showLoading.value = false
+                showAlert.value = true
+                iconType.value = 'success'
+                messageAlert.value = data?.data?.message?.resMgs
+                onGetInfo()
+            } else {
+                showLoading.value = false
+                showAlert.value = true
+                iconType.value = 'error'
+                messageAlert.value = data?.data?.message?.resMgs
+            }
+        })
+    } catch (error) {
+        console.log(error)
     }
+
 }
 if (process.server) {
     await onGetInfo()
 }
-// watch(userShareList, () => {
-//     const indexItems = userShareList.value.length - 1
-//     // console.log(userShareList.value)
-//     // console.log(indexItems)
-//     console.log(userShareList.value[indexItems])
-// })
-// watch(branchCode, () => {
-//     onGetDeptMent(branchCode.value)
-// })
-// watch(sectionCode, () => {
-//     onGetUser(sectionCode.value)
-// })
+
 watch(page, () => {
-    startPage.value = (page.value - 1) * 10
-    endPage.value = page.value * 10
+    startPage.value = (page.value - 1) * 20
+    endPage.value = page.value * 20
 })
 onMounted(() => {
 

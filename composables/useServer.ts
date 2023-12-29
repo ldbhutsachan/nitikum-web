@@ -7,25 +7,16 @@ export function useServer<T>(url: string, options: UseFetchOptions<T> = {}) {
     if (process.server) {
         hder = useRequestHeaders();
     }
-
-    const config = useRuntimeConfig();
-    // console.log("config==",config.API_URL)
     const defaults: UseFetchOptions<T> = {
-        baseURL: '/financial/law-ldb/api/',
-        // cache request
+        baseURL: '/law-ldb/api/',
         key: url,
-
-        // set user token if connected
         headers: {
-            Authorization: token.value ? token.value: 'token',
-            // 'x-api-key': config.API_KEY,
+            Authorization: token.value ? token.value : 'token',
             ...hder,
         },
-
         onResponse(_ctx) {
             // _ctx.response._data = new myBusinessResponse(_ctx.response._data)
         },
-
         onResponseError(_ctx) {
             // throw new myBusinessError()
             switch (_ctx.response.status) {
@@ -50,7 +41,6 @@ export function useServer<T>(url: string, options: UseFetchOptions<T> = {}) {
             }
         },
     };
-    // for nice deep defaults, please use unjs/defu
     const params = defu(options, defaults);
     return useFetch(url, params);
 }
