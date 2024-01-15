@@ -25,6 +25,7 @@
 <script setup lang="ts">
 const api = useRuntimeConfig()
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import loading from '~/components/loading/loading.vue'
 const showLoading = ref<boolean>(false)
 
@@ -40,13 +41,21 @@ const onLogin = async () => {
     showLoading.value = true
     try {
         await axios.post(`${api.public.API_URL}/Auth/login`, loginForm.value).then((data) => {
-            localStorage.setItem('token', data?.data?.resData[0]?.toKen)
-            localStorage.setItem('userId', data?.data?.resData[0]?.userId)
-            localStorage.setItem('userName', data?.data?.resData[0]?.userName)
-            localStorage.setItem('status', data?.data?.resData[0]?.userStatus)
-            localStorage.setItem('role', data?.data?.resData[0]?.typeDesc)
-            navigateTo('/home')
-            showLoading.value = false
+            if (data?.data?.message?.resCode === '00') {
+                localStorage.setItem('token', data?.data?.resData[0]?.toKen)
+                localStorage.setItem('userId', data?.data?.resData[0]?.userId)
+                localStorage.setItem('userName', data?.data?.resData[0]?.userName)
+                localStorage.setItem('status', data?.data?.resData[0]?.userStatus)
+                localStorage.setItem('role', data?.data?.resData[0]?.typeDesc)
+                navigateTo('/home')
+                showLoading.value = false
+            }else{
+                showLoading.value = false
+                Swal.fire({
+                    icon:'error',
+                    text: data?.data?.message?.resMgs
+                })
+            }
         })
     } catch (error) {
         console.log(error)
