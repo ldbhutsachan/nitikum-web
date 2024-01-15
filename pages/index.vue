@@ -27,6 +27,7 @@ const api = useRuntimeConfig()
 import axios from 'axios';
 import loading from '~/components/loading/loading.vue'
 const showLoading = ref<boolean>(false)
+
 definePageMeta({
     layout: false
 })
