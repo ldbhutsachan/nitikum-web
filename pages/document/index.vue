@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn variant="outlined" @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
             </v-btn>
@@ -8,10 +8,13 @@
             }})</span>
         </v-card>
 
-        <v-card width="1500" class="mx-auto">
+        <v-card width="2100" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A;">
+                        <th class="text-center text-white">
+                            ລ/ດ
+                        </th>
                         <th class="text-left text-white">
                             ຫົວຂໍ້ເອກະສານ
                         </th>
@@ -46,6 +49,7 @@
                     <tr v-for="(item, index) in documentList" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
+                        <td class="text-center">{{ index+1 }}</td>
                         <td style="height: 10;">{{ item?.subjectName }}</td>
                         <td style="font-size: 12pt;">{{ item?.docNo }} </td>
                         <td style="font-size: 12pt;">{{ item?.docDate }}</td>
@@ -85,8 +89,9 @@
                             <v-btn color="red" density="compact">{{ item?.docStatus }}</v-btn>
                         </td> -->
                         <td>
-                            <v-btn v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ'" density="comfortable" variant="text">
-                                <Icon name="mingcute:delete-3-fill" color="red" size="20" />ລົບອອກ
+                            <v-btn 
+                                class="ml-2" @click="onAskDeleteData(item?.id)" density="comfortable">
+                                <Icon name="mingcute:delete-3-fill" color="red" size="20" /> ລົບອອກ
                             </v-btn>
                         </td>
                     </tr>
@@ -193,6 +198,7 @@ import loading from '~/components/loading/loading.vue'
 import success from '~/components/Alerts/sucess.vue'
 //global state
 import { useManageState } from '~/stores/manage-state'
+import Swal from 'sweetalert2';
 const manageState = useManageState()
 const { setDocumentTypeList, setBranchList, setDeparmentList, setDocumentList } = manageState
 const docTypeList = computed(() => { return manageState.documentTypeList })
@@ -363,6 +369,51 @@ const onSaveDoc = async () => {
         }
     })
 }
+//delete data
+
+const onAskDeleteData = (key: any) => {
+    Swal.fire({
+        icon: 'question',
+        text: `ທ່ານຕ້ອງການລົບຂໍ້ມູນແທ້ບໍ`,
+        showCancelButton: true,
+        allowOutsideClick: false,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ຕົກລົງ',
+        cancelButtonText: 'ຍົກເລີກ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            onDelete(key)
+        }
+    })
+}
+const onDelete = async (key: any) => {
+    try {
+        showLoading.value = true
+        var body = {
+            deleteId: localStorage.getItem('userId'),
+            id: key
+        }
+        await axios.post(`${api.public.API_URL}/document/DeleteDoc`, body).then((data) => {
+            if (data?.data.message?.resCode === '00') {
+                showLoading.value = false
+                showAlert.value = true
+                iconType.value = 'success'
+                messageAlert.value = data?.data?.message?.resMgs
+                onGetInfo()
+            } else {
+                showLoading.value = false
+                showAlert.value = true
+                iconType.value = 'error'
+                messageAlert.value = data?.data?.message?.resMgs
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+//************************* */
 const locals = ref<any>('')
 const onGetUserInfo = () => {
     locals.value = localStorage.getItem('userId')

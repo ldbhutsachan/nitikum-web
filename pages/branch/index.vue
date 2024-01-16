@@ -1,13 +1,13 @@
 <template>
     <div>
-        <v-card width="1200" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
+        <v-card width="2100" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
             <v-btn color="#243B7A" @click="showDialogAddbranch = true">
                 <Icon name="mingcute:plus-line" />ເພີ່ມສາຂາ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ branchList?.resData?.length
             }})</span>
         </v-card>
-        <v-card width="1200" class="mx-auto">
+        <v-card width="2100" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A;">

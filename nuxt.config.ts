@@ -10,11 +10,11 @@ export default defineNuxtConfig({
     ['@pinia/nuxt', { autoImports: ['defineStore', 'acceptHMRUpdate'], },],
   ],
   runtimeConfig: {
-    API_URL: 'https://dehome.ldblao.la/meeting_api/prod/api/v1',
-    // API_URL:'http://10.0.10.49:9001/meeting_api/prod/api/v1',
+   // API_URL: 'https://dehome.ldblao.la/meeting_api/prod/api/v1',
+     API_URL:'http://10.0.10.49:9001/meeting_api/prod/api/v1',
     public: {
-      API_URL: 'https://dehome.ldblao.la/meeting_api/prod/api/v1'
-      // API_URL: 'http://10.0.10.49:9001/meeting_api/prod/api/v1'
+      //API_URL: 'https://dehome.ldblao.la/meeting_api/prod/api/v1'
+     API_URL: 'http://10.0.10.49:9001/meeting_api/prod/api/v1'
     }
   },
 

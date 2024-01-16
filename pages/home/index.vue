@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card width="1400" class="mx-auto card-shadow" rounded="lg">
+        <v-card width="2100" class="mx-auto card-shadow" rounded="lg">
             <v-card-text>
                 <v-carousel cycle show-arrows="hover" height="400" hide-delimiter-background>
 
@@ -29,9 +29,12 @@
                     <thead>
                         <tr style="background-color: #243B7A;">
                             <th class="text-left text-white">
+                                ລ/ດ
+                            </th>
+                            <th class="text-left text-white" style="width: 600px;">
                                 ຫົວຂໍ້
                             </th>
-                            <th class="text-left text-white">
+                            <th class="text-left text-white" style="width: 400px;">
                                 ພາກສ່ວນຮັບຜິດຊອບ
                             </th>
                             <th class="text-left text-white">
@@ -43,7 +46,7 @@
                             <th class="text-left text-white">
                                 ວັນທີເຜີຍແຜ່
                             </th>
-                            <th class="text-left text-white">
+                            <th class="text-left text-white" style="width: 300px;">
                                 ປະເພດເອກະສານ
                             </th>
                             <th class="text-left text-white">
@@ -58,11 +61,15 @@
                             <th class="text-left text-white">
                                 PDF-ENG
                             </th>
+                     
 
                         </tr>
                     </thead>
 
                     <tr style="background-color: #fff;">
+                        <th class="text-left text-white pl-4">
+
+                        </th>
                         <th class="text-left pl-0 pt-4" style="width: 200px;">
                             <v-text-field placeholder="ຫົວຂໍ້" v-model="formGetBySub.subjectName" @input="onGetDocBySubj"
                                 variant="outlined" density="compact"></v-text-field>
@@ -89,11 +96,8 @@
                         <th class="text-left text-white pl-4">
                             <v-btn @click="onGetDocInfo" style="margin-top: -8px;" rounded color="#243A7A" height="43"
                                 class="card-shadow">
-                                <Icon name="tabler:refresh" size="30" />Refresh
+                                <Icon name="tabler:refresh" size="30" />
                             </v-btn>
-                        </th>
-                        <th class="text-left text-white pl-4">
-
                         </th>
                         <th class="text-left text-white pl-4">
 
@@ -106,6 +110,7 @@
                         <tr v-for="(item, index) in shareDocData" :key="index"
                             :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', }"
                             @mouseover="active = index.toString()" @mouseleave="active = ''">
+                            <td>{{ index+1 }}</td>
                             <td>{{ item.subjectName }}</td>
                             <td>{{ item.sharingType }}</td>
                             <td>{{ item.docNo }}</td>
@@ -135,9 +140,12 @@
                                     </v-btn>
                                 </a>
                             </td>
-
-
-
+                            <!-- <td>
+                                <v-btn 
+                                class="ml-2" @click="onAskDeleteData(item?.id)" density="comfortable">
+                                <Icon name="mingcute:delete-3-fill" color="red" size="20" /> ລົບອອກ
+                            </v-btn>
+                            </td> -->
                         </tr>
                     </tbody>
                 </v-table>
@@ -181,7 +189,13 @@ import axios from 'axios';
 import loading from '~/components/loading/loading.vue'
 const showLoading = ref<boolean>(false)
 const shareDocData: any = ref([])
+const showAlert = ref<boolean>(false)
+const iconType = ref<string>('')
+const messageAlert = ref<string>('')
+
+
 import { useManageState } from '~/stores/manage-state'
+import Swal from 'sweetalert2';
 const manageState = useManageState()
 const active = ref<string>('')
 const selectedDate = ref<any>(null)
@@ -264,8 +278,8 @@ const onGetDocBySubj = async () => {
 const formGetS: any = ref({ secCode: '', markerId: '' })
 const onGetDocBySec = async () => {
     showLoading.value = true
-    formGetS.value.markerId = localStorage.getItem('userid')
     try {
+        formGetS.value.markerId = localStorage.getItem('userId')
         await axios.post(`${api.public.API_URL}/Share/getShareDocumentKanang`, formGetS.value).then((data) => {
             shareDocData.value = data?.data?.resData
             showLoading.value = false
@@ -274,8 +288,53 @@ const onGetDocBySec = async () => {
         console.log(error)
         showLoading.value = false
     }
-
 }
+//SHOW  DATA 
+
+//delete data
+
+const onAskDeleteData = (key: any) => {
+    Swal.fire({
+        icon: 'question',
+        text: `ທ່ານຕ້ອງການລົບຂໍ້ມູນແທ້ບໍ`,
+        showCancelButton: true,
+        allowOutsideClick: false,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ຕົກລົງ',
+        cancelButtonText: 'ຍົກເລີກ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            onDelete(key)
+        }
+    })
+}
+const onDelete = async (key: any) => {
+    try {
+        showLoading.value = true
+        var body = {
+            readBy: localStorage.getItem('userId'),
+            id: key
+        }
+        await axios.post(`${api.public.API_URL}/Share/ReadyDoc`, body).then((data) => {
+            if (data?.data.message?.resCode === '00') {
+                showLoading.value = false
+                showAlert.value = true
+                iconType.value = 'success'
+                messageAlert.value = data?.data?.message?.resMgs
+                onGetDocInfo()
+            } else {
+                showLoading.value = false
+                showAlert.value = true
+                iconType.value = 'error'
+                messageAlert.value = data?.data?.message?.resMgs
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+//************************* */
 const formGetType: any = ref({ docType: '', markerId: '' })
 const onGetDocByType = async () => {
     showLoading.value = true

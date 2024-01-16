@@ -1,13 +1,30 @@
 <template>
     <div>
+<v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" >
+<v-card-text class="pt-8">
+<v-label>ຄົ້ນຫາຂໍ້ມູນ</v-label>
+<br><br><br>
+
+<v-row>
+     <v-col cols="2">
+        <v-text-field type="date"  label="ຈາກວັນທີ"  hide-details="auto"></v-text-field>
+    </v-col>
+    <v-col cols="2">
+        <v-text-field type="date"  label="ຫາວັນທີ"  hide-details="auto"></v-text-field>
+    </v-col>
+    <v-col cols="2">
+       <v-btn hide-details="auto">ຄົ້ນຫາຂໍ້ມູນ</v-btn>
+    </v-col>
+</v-row>
+</v-card-text>
+</v-card>
+
+</div>
+    <div>
         <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
-            <!-- <v-btn @click="showDialogAdd = true" color="#243B7A">
-                <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
-            </v-btn> -->
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ documentList?.length
             }})</span>
         </v-card>
-
         <v-card width="2100" class="mx-auto">
             <v-table>
                 <thead>
@@ -38,12 +55,6 @@
                         </th>
                         <th class="text-left text-white">
                             PDF(EN)
-                        </th>
-                        <th class="text-left text-white" colspan="2">
-                            ອຸນຸມັດລາຍການ
-                        </th>
-                        <th class="text-left text-white" colspan="2">
-                            ຈັດການ
                         </th>
                     </tr>
                 </thead>
@@ -82,25 +93,6 @@
                                 </v-btn>
                             </a>
                         </td>
-                        <td>
-                            <v-btn v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ' && item?.docStatus !== 'ລາຍການຖືກປະຕິເສດ'"
-                                @click="onAskBeforeApprove(item?.id)" density="comfortable" color="#243A7A">
-                                ອະນຸມັດ
-                            </v-btn>
-                        </td>
-                        <td>
-                            <v-btn v-if="item?.docStatus === 'ລໍຖ້າອະນຸມັດ' && item?.docStatus !== 'ລາຍການຖືກປະຕິເສດ'"
-                                class="ml-2" @click="onAskBeforeReject(item?.id)" density="comfortable" color="red">
-                                ປະຕິເສດ
-                            </v-btn>
-                          
-                        </td>
-                        <td>
-                            <v-btn 
-                                class="ml-2" @click="onAskDeleteData(item?.id)" density="comfortable">
-                                <Icon name="mingcute:delete-3-fill" color="red" size="20" /> ລົບອອກ
-                            </v-btn>
-                        </td>
                     </tr>
                 </tbody>
             </v-table>
@@ -138,7 +130,7 @@ const { setDocumentList } = manageState
 
 const documentList = computed(() => { return manageState.documentList })
 // state
-
+const branchList = computed(() => { return manageState.branchList })
 const page = ref<number>(1)
 const startPage = ref<number>(0)
 const endPage = ref<number>(20)
@@ -271,6 +263,18 @@ const onAskBeforeReject = (key: any) => {
             onReject(key)
         }
     })
+}
+const onGetBranchList = async () => {
+    if (branchList.value.length === 0) {
+        let data = { branchCode: '' }
+        try {
+            await axios.post(`${api.public.API_URL}/Branch/getComboxBranch`, data).then((data) => {
+                setBranchList(data?.data?.resData)
+            });
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }
 const onReject = async (key: any) => {
     try {

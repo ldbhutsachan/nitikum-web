@@ -48,11 +48,7 @@ export const itemWaitContunue = [
 ]
 export const reports = [
     {
-        title:'ລາຍງານສະຖານະເອກະສານ',
-        to:'/'
-    },
-    {
-        title:'ລາຍງານສະຖານະການດຳເນີນການເອກະສານ',
-        to:'/'
+        title:'ລາຍງານ ເອກະສານ',
+        to:'/document'
     },
 ]
