@@ -1,8 +1,9 @@
 <template>
     <div class="bg">
-
         <v-card width="500" class="mx-auto" rounded="lg" elevation="10"
             style="background-color: rgba(12,13,14, .1);opacity: 0.9;">
+            <div class="text-center pt-10 text-white" style="font-size: 20pt;font-weight: bold;"><span style=""
+                    class="px-2">ລະບົບຄຸ້ມຄອງນິຕິກຳ</span></div>
             <div class="text-center pt-10 text-white" style="font-size: 20pt;font-weight: bold;"><span style=""
                     class="px-2">ເຂົ້າສູ່ລະບົບ</span></div>
             <div class="pa-10">

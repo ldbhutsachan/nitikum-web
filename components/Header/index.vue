@@ -20,8 +20,8 @@
                         <!-- <v-spacer></v-spacer> -->
                         <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;line-height: 30px;"
                             class="pl-10 text-">
-                            <span style="font-size: 20pt;">ລະບົບຄຸ້ມຄອງນິຕິກຳ ທະນາຄານພັດທະນາລາວ</span>
-                            <span style="font-size: 12pt;font-weight: bold;">LDB BANK Legal Management System</span>
+                            <span style="font-size: 20pt;">ລະບົບຄຸ້ມຄອງນິຕິກຳ</span>
+                            <span style="font-size: 12pt;font-weight: bold;">Legal Management System</span>
                         </div>
                         <v-spacer></v-spacer>
                         <v-spacer></v-spacer>
