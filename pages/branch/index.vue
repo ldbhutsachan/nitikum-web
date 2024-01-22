@@ -1,16 +1,19 @@
 <template>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
             <v-btn color="#243B7A" @click="showDialogAddbranch = true">
                 <Icon name="mingcute:plus-line" />ເພີ່ມສາຂາ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ branchList?.resData?.length
             }})</span>
         </v-card>
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A;">
+                        <th class="text-left text-white" style="width: 90px;">
+                            ລ/ດ
+                        </th>
                         <th class="text-left text-white">
                             ລະຫັດສາຂາ
                         </th>
@@ -35,6 +38,7 @@
                     <tr v-for="(item, index) in branchList?.resData?.slice(startPage, endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
+                        <td>{{ index+1 }}</td>
                         <td style="height: 10;">{{ item.branchCode }}</td>
                         <td style="font-size: 12pt;"><span style="font-weight: bold;font-size: 12pt;">{{ item.brName }}
                             </span><br /> {{ item.brNameLa }}</td>
@@ -136,7 +140,7 @@ const showSuccess = ref<boolean>(false)
 // const setBranchList = ref<BranchModel>()
 const page = ref<number>(1)
 const startPage = ref<number>(0)
-const endPage = ref<number>(20)
+const endPage = ref<number>(10)
 const countPage = ref<number>(0)
 // form data
 const branchFormCreate = ref({
@@ -264,8 +268,8 @@ const onUpdateBranch = async () => {
     }
 }
 watch(page, () => {
-    startPage.value = (page.value - 1) * 20
-    endPage.value = page.value * 20
+    startPage.value = (page.value - 1) * 10
+    endPage.value = page.value * 10
 })
 onMounted(() => {
     onGetBranchList()

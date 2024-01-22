@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <!-- <v-btn @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
             </v-btn> -->
@@ -8,7 +8,7 @@
             }})</span>
         </v-card>
 
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A;">

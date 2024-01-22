@@ -1,6 +1,6 @@
 <template>
     <div>
-<v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" >
+<v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" >
 <v-card-text class="pt-8">
 <v-label>ຄົ້ນຫາຂໍ້ມູນ</v-label>
 <br><br><br>
@@ -21,11 +21,11 @@
 
 </div>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ documentList?.length
             }})</span>
         </v-card>
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A;">

@@ -3,7 +3,7 @@
 
         <div style="display: flex;flex-direction: column;justify-content: space-between;align-items: center;width: 100%;">
             <div class="pt-6">
-                <v-card width="2100" color="#191947" class="mx-auto " elevation="0">
+                <v-card width="1500" color="#191947" class="mx-auto " elevation="0">
                     <div class="d-flex align-center">
                         <div style="display: flex;justify-content: start;align-items: center;">
                             <img class="mx-auto" src="../../assets/icons/newLogo.jpeg" width="70"
@@ -30,7 +30,7 @@
                 </v-card>
             </div>
             <div style="width: 100%;background-color: #243B7A;" class="mt-6">
-                <v-card width="2100" color="#243B7A" class="mx-auto" elevation="0">
+                <v-card width="1500" color="#243B7A" class="mx-auto" elevation="0">
                     <div class="d-flex align-center">
                         <v-btn color="white" height="40" to="/home">
                             ໜ້າຫຼັກ

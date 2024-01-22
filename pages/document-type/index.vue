@@ -1,13 +1,13 @@
 <template>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນປະເພດເອກະສານ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ docTypeList?.length
             }})</span>
         </v-card>
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A">

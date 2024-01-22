@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card width="2100" class="mx-auto card-shadow" rounded="lg">
+        <v-card width="1500" class="mx-auto card-shadow" rounded="lg">
             <v-card-text>
                 <v-carousel cycle show-arrows="hover" height="400" hide-delimiter-background>
 
@@ -36,6 +36,9 @@
                             </th>
                             <th class="text-left text-white" style="width: 400px;">
                                 ພາກສ່ວນຮັບຜິດຊອບ
+                            </th>
+                            <th class="text-left text-white" style="width: 400px;">
+                                ປະເພດການເຜີຍເເຜ່
                             </th>
                             <th class="text-left text-white">
                                 ເລກທີເອກະສານ
@@ -75,8 +78,11 @@
                                 variant="outlined" density="compact"></v-text-field>
                         </th>
                         <th class="text-left  pl-4 pt-4">
-                            <v-select :items="sectiontList" v-model="formGetS.secCode" @update:model-value="onGetDocBySec"
+                            <!-- <v-select :items="sectiontList" v-model="formGetS.secCode" @update:model-value="onGetDocBySec"
                                 label="ເລືອກລາຍການ" item-title="brNameLa" item-value="branchCode" variant="outlined"
+                                density="compact"></v-select> -->
+                                <v-select :items="sectiontList" v-model="formGetS.secCode" @update:model-value="onGetDocBySec"
+                                label="ເລືອກລາຍການ" item-title="brNameLa" item-value="brNameLa" variant="outlined"
                                 density="compact"></v-select>
                         </th>
                         <th class="text-left text-white pl-4">
@@ -112,6 +118,7 @@
                             @mouseover="active = index.toString()" @mouseleave="active = ''">
                             <td>{{ index+1 }}</td>
                             <td>{{ item.subjectName }}</td>
+                            <td>{{ item.related_Name }}</td>
                             <td>{{ item.sharingType }}</td>
                             <td>{{ item.docNo }}</td>
                             <td>{{ item.docDate }}</td>

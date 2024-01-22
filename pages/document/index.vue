@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn variant="outlined" @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນເອກະສານ
             </v-btn>
@@ -8,7 +8,7 @@
             }})</span>
         </v-card>
 
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A;">
@@ -29,6 +29,9 @@
                         </th>
                         <th class="text-left text-white">
                             ປະເພດ Share
+                        </th>
+                        <th class="text-left text-white">
+                            ພາກສ່ວນຮັບຜິດຊອບ
                         </th>
                         <th class="text-left text-white">
                             PDF(LAO)
@@ -55,6 +58,7 @@
                         <td style="font-size: 12pt;">{{ item?.docDate }}</td>
                         <td style="font-size: 12pt;">{{ item?.docDescLao }}</td>
                         <td style="font-size: 12pt;">{{ item?.sharingType }}</td>
+                        <td style="font-size: 12pt;">{{ item?.related_Name }}</td>
                         <td>
                             <a v-if="item?.docPathLa !== null && item?.docPathLa !== ''" :href="item?.docPathLa"
                                 target="_blank">
@@ -137,7 +141,14 @@
                                     :rules="[v => !!v || 'ກະລຸນາເລືອກປະເພດການ Share']"></v-select>
                             </v-col>
                             <v-col cols="12" md="6" sm="4" v-if="formAdd.sharingType === 'V'">
-                                <v-select multiple chips v-model="formAdd.related" label="ເອກະສານຕິດພັນກັບສາຂາ"
+                                <v-select multiple chips v-model="formAdd.related" label="ເລືອກຝ່າຍທີຕ້ອງການເພີຍເເຜ່"
+                                    hide-details="auto" :items="branchList" item-title="brNameLa" item-value="branchCode"
+                                    @update:model-value="onGetDeptMent"></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6" sm="4" >
+                                <v-select multiple chips v-model="formAdd.related_No" label="ເລືອກພາກສ່ວນຮັບຜິດຊອບ" style="color: crimson;"
                                     hide-details="auto" :items="branchList" item-title="brNameLa" item-value="branchCode"
                                     @update:model-value="onGetDeptMent"></v-select>
                             </v-col>
@@ -251,7 +262,9 @@ const formAdd: any = ref({
     docStatus: '',
     details: '',
     filesEn: '',
-    filesLao: ''
+    filesLao: '',
+    related_No: [],
+    related_Name:[],
 })
 const formGetDoc: any = ref({
     markerId: ''
@@ -343,6 +356,9 @@ const onSaveDoc = async () => {
     formData.append('markerId', formAdd.value.markerId)
     formData.append('sharingType', formAdd.value.sharingType)
     formData.append('details', formAdd.value.details)
+    formData.append('related_No',formAdd.value.related_No)
+    formData.append('related_Name', formAdd.value.related_No)
+
     await axios.post(`${api.public.API_URL}/Document/SaveDoc`, formData).then((data) => {
         if (data?.data?.message?.resCode === '00') {
             formAdd.value.subjectName = ''
@@ -356,6 +372,8 @@ const onSaveDoc = async () => {
             formAdd.value.details = ''
             formAdd.value.filesEn = ''
             formAdd.value.filesLao = ''
+            formAdd.value.related_No = []
+            formAdd.value.related_Name = []
             onGetInfo()
             showLoading.value = false
             showAlert.value = true

@@ -1,13 +1,13 @@
 <template>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn @click="showDialogAdd = true" color="#243B7A">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຂໍ້ມູນຂະແໜງ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ sectiontList?.length
             }})</span>
         </v-card>
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A">
@@ -124,7 +124,7 @@ const showDialogAdd = ref<boolean>(false)
 const showDialogUpdate = ref<boolean>(false)
 const page = ref<number>(1)
 const startPage = ref<number>(0)
-const endPage = ref<number>(20)
+const endPage = ref<number>(10)
 const countPage = ref<number>(0)
 // form data
 const formAdd = ref({
@@ -266,8 +266,8 @@ const onDelete = async (key: any) => {
     }
 }
 watch(page, () => {
-    startPage.value = (page.value - 1) * 20
-    endPage.value = page.value * 20
+    startPage.value = (page.value - 1) * 10
+    endPage.value = page.value * 10
 })
 onMounted(() => {
     onGetDeptMent()

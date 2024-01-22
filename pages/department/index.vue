@@ -1,16 +1,19 @@
 <template>
     <div>
-        <v-card width="2100" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="1500" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn color="#243B7A" @click="showDialogAdd = true">
                 <Icon name="mingcute:plus-line" />ເພີ່ມຝ່າຍ
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ departmentList?.length
             }})</span>
         </v-card>
-        <v-card width="2100" class="mx-auto">
+        <v-card width="1500" class="mx-auto">
             <v-table>
                 <thead>
                     <tr style="background-color: #243B7A">
+                        <th class="text-left text-white">
+                        ລ/ດ
+                        </th>
                         <th class="text-left text-white">
                             ລະຫັດ
                         </th>
@@ -30,6 +33,7 @@
                     <tr v-for="(item, index) in departmentList.slice(startPage, endPage)" :key="index"
                         :style="{ 'backgroundColor': active === index.toString() ? '#BCE774' : index % 2 === 0 ? '#E4F1F4' : '#F8F8F8', 'cursor': 'pointer', 'height': '10px' }"
                         @mouseover="active = index.toString()" @mouseleave="active = ''">
+                        <td>{{ index+1 }}</td>
                         <td>{{ item?.deptId }}</td>
                         <td style="font-size: 10pt;"><span style="font-weight: bold;">{{ item?.deptDesc }}</span><br /> {{
                             item?.deptLao }}</td>
@@ -117,7 +121,7 @@ const showLoading = ref<boolean>(false)
 const showDialogUpdate = ref<boolean>(false)
 const page = ref<number>(1)
 const startPage = ref<number>(0)
-const endPage = ref<number>(20)
+const endPage = ref<number>(10)
 const countPage = ref<number>(0)
 // stores state
 const manageState = useManageState()
@@ -240,8 +244,8 @@ const onDelete = async (key: any,) => {
     }
 }
 watch(page, () => {
-    startPage.value = (page.value - 1) * 20
-    endPage.value = page.value * 20
+    startPage.value = (page.value - 1) * 10
+    endPage.value = page.value * 10
 })
 onMounted(() => {
     onGetBranchList()
