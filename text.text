@@ -1,0 +1,28 @@
+<template>
+    <v-dialog v-model="loading" width="120" persistent>
+        <v-card color="#243B7A" rounded="lg" height="100" elevation="10" class="pa-2" style="display: flex;justify-content: center;align-items: center;">
+                <v-progress-circular :size="50" color="white" indeterminate></v-progress-circular>
+        </v-card>
+    </v-dialog>
+</template>
+<script>
+export default {
+    props: {
+        value: {
+            type: Boolean,
+            default: false
+        }
+    },
+    computed: {
+        loading: {
+            get() {
+                return this.value;
+            },
+            set(value) {
+                this.$emit('input', value)
+            }
+        }
+    },
+}
+</script>
+"@invictus.codes/nuxt-vuetify": "^0.3.0",

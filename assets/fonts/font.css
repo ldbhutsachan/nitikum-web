@@ -1,0 +1,11 @@
+
+ @font-face {
+    font-family: 'Noto Sans Lao UI';
+    src: url('NotoSansLao-Regular.ttf');
+    font-weight: normal;
+  }
+  .card-shadow {
+    box-shadow: 0 10px 17px 0 rgba(0, 0, 0, 0.116) !important;
+  }
+  
+  
