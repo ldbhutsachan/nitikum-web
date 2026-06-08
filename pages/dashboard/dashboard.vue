@@ -61,6 +61,100 @@ function gradientFromName(name) {
   const base = stringToColor(name)
   return `linear-gradient(90deg, ${base}, ${base}80)`
 }
+
+const summaryChart = computed(() => ({
+  series: [
+    {
+      name: 'ນິຕິກຳໃໝ່',
+      type: 'column',
+      data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30]
+    },
+    {
+      name: 'ນິຕິກຳທັງໝົດ',
+      type: 'area',
+      data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43]
+    },
+    {
+      name: 'ຮ່າງເອກະສານ',
+      type: 'line',
+      data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39]
+    }
+  ],
+
+  chartOptions: {
+    chart: {
+      height: 350,
+      type: 'line',
+      stacked: false,
+      toolbar: {
+        show: true
+      }
+    },
+
+    colors: ['#2196F3', '#00C853', '#FB8C00'],
+
+    stroke: {
+      width: [0, 3, 4],
+      curve: 'smooth'
+    },
+
+    plotOptions: {
+      bar: {
+        columnWidth: '45%',
+        borderRadius: 6
+      }
+    },
+
+    fill: {
+      opacity: [1, 0.25, 1],
+      gradient: {
+        inverseColors: false,
+        shade: 'light',
+        type: 'vertical',
+        opacityFrom: 0.7,
+        opacityTo: 0.2,
+        stops: [0, 100]
+      }
+    },
+
+    labels: [
+      '2024-01',
+      '2024-02',
+      '2024-03',
+      '2024-04',
+      '2024-05',
+      '2024-06',
+      '2024-07',
+      '2024-08',
+      '2024-09',
+      '2024-10',
+      '2024-11'
+    ],
+
+    markers: {
+      size: 4
+    },
+
+    xaxis: {
+      type: 'category'
+    },
+
+    yaxis: {
+      title: {
+        text: 'ຈຳນວນເອກະສານ'
+      }
+    },
+
+    legend: {
+      position: 'bottom'
+    },
+
+    tooltip: {
+      shared: true,
+      intersect: false
+    }
+  }
+}))
 </script>
 
 <template>
@@ -207,7 +301,30 @@ function gradientFromName(name) {
     </v-card>
   </v-col>
 </v-row>
-
     <!-- end -->
+
+    <!-- chart grap -->
+    <v-row class="mt-6">
+  <v-col cols="12">
+    <v-card class="elevation-12">
+      <v-card-title>
+        <v-icon color="blue" class="mr-2">
+          mdi-chart-line
+        </v-icon>
+        ສະຫຼຸບສະຖິຕິນິຕິກຳ
+      </v-card-title>
+
+      <v-card-text>
+        <ApexCharts
+          height="400"
+          type="line"
+          :options="summaryChart.chartOptions"
+          :series="summaryChart.series"
+        />
+      </v-card-text>
+    </v-card>
+  </v-col>
+</v-row>
+    <!-- chart grap -->
   </v-container>
 </template>
