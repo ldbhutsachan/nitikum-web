@@ -22,13 +22,13 @@ export default defineNuxtConfig({
   ],
   
   runtimeConfig: {
-    // API_URL: 'https://dehome.ldblao.la/meet-law/prod/api/v1',
-    API_URL: 'http://10.0.10.49:9001/meet-law/prod/api/v1',
+    API_URL: 'https://dehome.ldblao.la/meet-law/prod/api/v1',
+    // API_URL: 'http://10.0.10.49:9001/meet-law/prod/api/v1',
     public: {
-      // API_URL: 'https://dehome.ldblao.la/meet-law/prod/api/v1',
-      // DOC_URL: 'https://dehome.ldblao.la/mobile/QR/IMGMOBILE/iadoc/uploads'
-      API_URL: 'http://10.0.10.49:9001/meet-law/prod/api/v1',
-      DOC_URL: 'http://10.0.10.49:9001/mobile/QR/IMGMOBILE/iadoc/uploads'
+      API_URL: 'https://dehome.ldblao.la/meet-law/prod/api/v1',
+      DOC_URL: 'https://dehome.ldblao.la/mobile/QR/IMGMOBILE/iadoc/uploads'
+      // API_URL: 'http://10.0.10.49:9001/meet-law/prod/api/v1',
+      // DOC_URL: 'http://10.0.10.49:9001/mobile/QR/IMGMOBILE/iadoc/uploads'
     }
   },
   build: {

@@ -1,6 +1,7 @@
 <!-- pages/Dashboard.vue -->
+<!-- pages/Dashboard.vue -->
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import ApexCharts from 'vue3-apexcharts'
 
@@ -12,29 +13,151 @@ const startDate = ref('')
 const endDate = ref('')
 
 const fetchDashboard = async () => {
-  const { data } = await axios.post(
-    'http://10.0.10.49:9001/meet-law/prod/api/v1/dashboard',
-    { startDate: startDate.value, endDate: endDate.value }
-  )
-  caltotal.value = data.caltotalGroup
-  transactions.value = data.transactionsGroup
-  sections.value = data.sectionGroup
+  try {
+    const config = useRuntimeConfig()
+    const base = config?.public?.API_URL
+    const endpoint = base.includes('dashboard') ? base : `${base.replace(/\/$/, '')}/dashboard`
+
+    const hasForm = typeof formGetType !== 'undefined' && formGetType && formGetType.value
+    const payload = hasForm ? formGetType.value : { startDate: startDate.value, endDate: endDate.value }
+
+    const { data } = await axios.post(endpoint, payload)
+
+    caltotal.value = data.caltotalGroup
+    transactions.value = data.transactionsGroup
+    sections.value = data.sectionGroup
+  } catch (err) {
+    console.error('fetchDashboard error:', err)
+  }
 }
 
-// Chart configs
-const transactionChart = computed(() => ({
-  chart: { type: 'bar', toolbar: { show: false } },
-  colors: ['#2196F3'],
-  xaxis: { categories: transactions.value.map(t => t.typeDocumentName) },
-  series: [{ name: 'Documents', data: transactions.value.map(t => Number(t.totalAmt)) }]
-}))
+// Fetch data when component mounts
+onMounted(() => {
+  fetchDashboard()
+})
+// Horizontal bar chart configs (Apex)
+const transactionChart = computed(() => {
+  const items = [...transactions.value].map(t => ({ name: t.typeDocumentName, value: Number(t.totalAmt) }))
+    .sort((a, b) => b.value - a.value)
 
-const sectionChart = computed(() => ({
-  chart: { type: 'bar', toolbar: { show: false } },
-  colors: ['#42A5F5'],
-  xaxis: { categories: sections.value.map(s => s.secName) },
-  series: [{ name: 'Sections', data: sections.value.map(s => Number(s.totalAmt)) }]
-}))
+  const categories = items.map(i => i.name)
+  const data = items.map(i => i.value)
+  const colors = items.map(i => stringToColor(i.name))
+
+  return {
+    series: [{ name: 'ຈຳນວນ', data }],
+    chartOptions: {
+      chart: { type: 'bar', toolbar: { show: false }, fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          barHeight: '44%',
+          borderRadius: 8,
+          distributed: true,
+          backgroundBarColors: ['#eceff1'],
+          backgroundBarRadius: 8
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val, opts) {
+          const max = Math.max(...data)
+          const pct = max > 0 ? Math.round((val / max) * 100) : 0
+          return pct + '%'
+        },
+        style: { colors: ['#263238'], fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' },
+        offsetX: 0,
+        dropShadow: { enabled: false },
+        background: { enabled: false },
+        // place labels outside at the end of the bar
+        textAnchor: 'end'
+      },
+      colors,
+      xaxis: { categories, labels: { formatter: val => formatNumber(val), style: { fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' } } },
+      yaxis: { labels: { style: { fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' } } },
+      grid: { show: true, borderColor: '#eaf2fb' },
+      tooltip: { y: { formatter: val => formatNumber(val) } }
+    }
+  }
+})
+
+const sectionChart = computed(() => {
+  const items = [...sections.value].map(s => ({ name: s.secName, value: Number(s.totalAmt) }))
+    .sort((a, b) => b.value - a.value)
+
+  const categories = items.map(i => i.name)
+  const data = items.map(i => i.value)
+  const colors = items.map(i => stringToColor(i.name))
+
+  return {
+    series: [{ name: 'ຈຳນວນ', data }],
+    chartOptions: {
+      chart: { type: 'bar', toolbar: { show: false }, fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          barHeight: '44%',
+          borderRadius: 8,
+          distributed: true,
+          backgroundBarColors: ['#eceff1'],
+          backgroundBarRadius: 8
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val, opts) {
+          const max = Math.max(...data)
+          const pct = max > 0 ? Math.round((val / max) * 100) : 0
+          return pct + '%'
+        },
+        style: { colors: ['#263238'], fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' },
+        offsetX: 0,
+        dropShadow: { enabled: false },
+        background: { enabled: false },
+        textAnchor: 'end'
+      },
+      colors,
+      xaxis: { categories, labels: { formatter: val => formatNumber(val), style: { fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' } } },
+      yaxis: { labels: { style: { fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' } } },
+      grid: { show: true, borderColor: '#eaf2fb' },
+      tooltip: { y: { formatter: val => formatNumber(val) } }
+    }
+  }
+})
+
+// Prepare items for custom list-style bars (label, track, colored fill, percent)
+const transactionItems = computed(() => {
+  const items = (transactions.value || []).map(t => ({ name: t.typeDocumentName, value: Number(t.totalAmt) || 0 }))
+  const max = Math.max(...items.map(i => i.value), 1)
+  return items
+    .sort((a, b) => b.value - a.value)
+    .map(i => ({ ...i, pct: Math.round((i.value / max) * 100), color: stringToColor(i.name) }))
+})
+
+const sectionItems = computed(() => {
+  const items = (sections.value || []).map(s => ({ name: s.secName, value: Number(s.totalAmt) || 0 }))
+  const max = Math.max(...items.map(i => i.value), 1)
+  return items
+    .sort((a, b) => b.value - a.value)
+    .map(i => ({ ...i, pct: Math.round((i.value / max) * 100), color: stringToColor(i.name) }))
+})
+
+// Pagination: 10 rows per page
+const pageSize = 10
+
+const transactionPage = ref(1)
+const transactionPageCount = computed(() => Math.max(1, Math.ceil(transactionItems.value.length / pageSize)))
+const transactionItemsPaged = computed(() => {
+  const start = (transactionPage.value - 1) * pageSize
+  return transactionItems.value.slice(start, start + pageSize)
+})
+
+const sectionPage = ref(1)
+const sectionPageCount = computed(() => Math.max(1, Math.ceil(sectionItems.value.length / pageSize)))
+const sectionItemsPaged = computed(() => {
+  const start = (sectionPage.value - 1) * pageSize
+  return sectionItems.value.slice(start, start + pageSize)
+})
 
 const sectionDonut = computed(() => ({
   chart: { type: 'donut' },
@@ -60,6 +183,12 @@ function stringToColor(str) {
 function gradientFromName(name) {
   const base = stringToColor(name)
   return `linear-gradient(90deg, ${base}, ${base}80)`
+}
+
+// Format numbers with thousands separator
+function formatNumber(n) {
+  if (n === null || n === undefined) return ''
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 const summaryChart = computed(() => ({
@@ -229,7 +358,7 @@ const summaryChart = computed(() => ({
 
     <!-- Charts -->
     <v-row class="mt-6">
-  <!-- Transactions Table Chart -->
+  <!-- Transactions Chart -->
   <v-col cols="12" md="6">
     <v-card class="elevation-12">
       <v-card-title class="blue--text text-h6">
@@ -237,35 +366,28 @@ const summaryChart = computed(() => ({
         ປະເພດນິຕິກຳ
       </v-card-title>
       <v-card-text>
-        <v-data-table
-          :headers="[
-            { text: 'ປະເພດເອກະສານ', value: 'typeDocumentName' },
-            { text: 'Chart', value: 'chart' },
-            { text: 'ຈຳນວນ', value: 'totalAmt' }
-          ]"
-          :items="transactions"
-          dense
-          hide-default-footer
-        >
-          <!-- Chart column with auto gradient -->
-          <template v-slot:item.chart="{ item }">
-            <v-progress-linear
-              :value="Number(item.totalAmt)"
-              height="15"
-              rounded
-              :style="{ background: gradientFromName(item.typeDocumentName) }"
-            ></v-progress-linear>
-          </template>
-          <!-- Number column -->
-          <template v-slot:item.totalAmt="{ item }">
-            <span class="font-weight-bold blue--text">{{ item.totalAmt }}</span>
-          </template>
-        </v-data-table>
+        <div>
+          <div v-for="item in transactionItemsPaged" :key="item.name" class="d-flex align-center" style="padding:10px 0;border-bottom:0px solid transparent">
+            <div style="width:30%;font-weight:500">{{ item.name }}</div>
+            <div style="flex:1;margin:0 12px">
+              <div style="background:#eceff1;border-radius:8px;height:10px;position:relative;overflow:hidden">
+                <div :style="{ width: item.pct + '%', background: item.color, height: '10px', borderRadius: '8px' }"></div>
+              </div>
+            </div>
+            <div style="width:96px;text-align:right;font-weight:600">
+              <div>{{ formatNumber(item.value) }}</div>
+              <div style="font-size:12px;color:#6b7280">{{ item.pct }}%</div>
+            </div>
+          </div>
+          <div class="d-flex justify-center pa-3">
+            <v-pagination v-model="transactionPage" :length="transactionPageCount" />
+          </div>
+        </div>
       </v-card-text>
     </v-card>
   </v-col>
 
-  <!-- Sections Table Chart -->
+  <!-- Sections Chart -->
   <v-col cols="12" md="6">
     <v-card class="elevation-12">
       <v-card-title class="blue--text text-h6">
@@ -273,30 +395,23 @@ const summaryChart = computed(() => ({
         ນິຕິກຳເເຕ່ລະຝ່າຍ
       </v-card-title>
       <v-card-text>
-        <v-data-table
-          :headers="[
-            { text: 'ພາກສ່ວນ/ຝ່າຍ', value: 'secName' },
-            { text: 'Chart', value: 'chart' },
-            { text: 'ຈຳນວນ', value: 'totalAmt' }
-          ]"
-          :items="sections"
-          dense
-          hide-default-footer
-        >
-          <!-- Chart column with auto gradient -->
-          <template v-slot:item.chart="{ item }">
-            <v-progress-linear
-              :value="Number(item.totalAmt)"
-              height="15"
-              rounded
-              :style="{ background: gradientFromName(item.secName) }"
-            ></v-progress-linear>
-          </template>
-          <!-- Number column -->
-          <template v-slot:item.totalAmt="{ item }">
-            <span class="font-weight-bold blue--text">{{ item.totalAmt }}</span>
-          </template>
-        </v-data-table>
+        <div>
+          <div v-for="item in sectionItemsPaged" :key="item.name" class="d-flex align-center" style="padding:10px 0;border-bottom:0px solid transparent">
+            <div style="width:30%;font-weight:500">{{ item.name }}</div>
+            <div style="flex:1;margin:0 12px">
+              <div style="background:#eceff1;border-radius:8px;height:10px;position:relative;overflow:hidden">
+                <div :style="{ width: item.pct + '%', background: item.color, height: '10px', borderRadius: '8px' }"></div>
+              </div>
+            </div>
+            <div style="width:96px;text-align:right;font-weight:600">
+              <div>{{ formatNumber(item.value) }}</div>
+              <div style="font-size:12px;color:#6b7280">{{ item.pct }}%</div>
+            </div>
+          </div>
+          <div class="d-flex justify-center pa-3">
+            <v-pagination v-model="sectionPage" :length="sectionPageCount" />
+          </div>
+        </div>
       </v-card-text>
     </v-card>
   </v-col>

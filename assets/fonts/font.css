@@ -7,5 +7,15 @@
   .card-shadow {
     box-shadow: 0 10px 17px 0 rgba(0, 0, 0, 0.116) !important;
   }
+ 
+   /* Phetsalate font (drop Phetsalate-Regular.ttf into this folder) */
+   @font-face {
+     font-family: 'Phetsalate';
+     src: url('Phetsalate-Regular.ttf') format('truetype');
+     font-weight: 400;
+     font-style: normal;
+     font-display: swap;
+   }
+
   
   
