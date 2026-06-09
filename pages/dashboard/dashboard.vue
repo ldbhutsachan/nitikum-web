@@ -18,6 +18,80 @@ const docTypes = ref([])
 const branches = ref([])
 const selectedDocType = ref('')
 const selectedBranch = ref('')
+// popup state for stat cards
+const popupDialog = ref(false)
+const popupData = ref([])
+const popupLoading = ref(false)
+const popupStatus = ref('')
+const popupStatusLabel = computed(() => {
+  switch ((popupStatus.value || '').toString()) {
+    case 'ALL': return 'ລວມທັງໝົດ'
+    case 'N': return 'ເອກະສານໃໝ່'
+    case 'O': return 'ເອກະສານເກົ່າ'
+    case 'NN': return 'ຮ່າງໃໝ່'
+    case 'OO': return 'ຮ່າງປັບປຸ່ງ'
+    default: return 'ລາຍການ'
+  }
+})
+const popupTotalCount = computed(() => (popupData.value ? popupData.value.length : 0))
+const popupTitleText = computed(() => {
+  if (popupLoading.value) return `${popupStatusLabel.value} — ກຳລັງໂຫຼດ...`
+  return `${popupStatusLabel.value} — ${popupTotalCount.value} ລາຍການ`
+})
+const popupHeaders = computed(() => {
+    return [
+    { text: 'ລ/ດ', value: 'id' },
+    { text: 'ເລກທີເອກະສານ', value: 'docNo' },
+    { text: 'ປະເພດເອກະສານ', value: 'docDescLao' },
+    { text: 'ຫົວຂໍ້ເອກະສານ', value: 'subjectName' },
+    { text: 'ວັນທີ', value: 'docDate' },
+    { text: 'ຕິດພັນກັບຝ່າຍ/ສາຂາ', value: 'relatedShow' },
+    { text: 'PDF (LAO)', value: 'docPathLa' },
+    { text: 'PDF (EN)', value: 'docPath' }
+  ]
+})
+
+const popupPage = ref(1)
+const popupPerPage = 7
+const popupPageCount = computed(() => Math.max(1, Math.ceil((popupData.value || []).length / popupPerPage)))
+const pagedPopupData = computed(() => {
+  const items = popupData.value || []
+  const start = (popupPage.value - 1) * popupPerPage
+  return items.slice(start, start + popupPerPage)
+})
+
+// reset page when data changes
+watch(popupData, () => { popupPage.value = 1 })
+
+async function fetchPopup(ses_status) {
+  popupLoading.value = true
+  popupDialog.value = true
+  try {
+    const payload = {
+      startDate: startDate.value || '',
+      endDate: endDate.value || '',
+      secCode: selectedBranch.value || '',
+      docType: selectedDocType.value || '',
+      ses_status: ses_status
+    }
+    const url = 'https://dehome.ldblao.la/meet-law/prod/api/v1/Share/getDocumentPopUp'
+    const { data } = await axios.post(url, payload)
+    // response may vary — prefer resData
+    popupData.value = data?.resData || data || []
+  } catch (e) {
+    console.error('fetchPopup error', e)
+    popupData.value = []
+  } finally {
+    popupLoading.value = false
+  }
+}
+
+function openPopupFor(status) {
+  // status should be one of: 'ALL','N','O','NN','OO'
+  popupStatus.value = status
+  popupPage.value = 1
+  fetchPopup(status)
+}
 
 const fetchDashboard = async () => {
   try {
@@ -84,8 +158,9 @@ async function fetchDocTypes() {
     const endpoint = `${base.replace(/\/$/, '')}/DocumentType/getDocumentType`
     const { data } = await axios.post(endpoint, {})
     if (data && data.resData) {
-      // prefer Lao description when available
-      docTypes.value = data.resData.map(d => ({ label: d.docDescLao || d.docDesc || d.docType, value: d.docType }))
+        // prefer Lao description when available; prepend an 'All' option
+        const mapped = data.resData.map(d => ({ label: d.docDescLao || d.docDesc || d.docType, value: d.docType }))
+        docTypes.value = [{ label: 'ທັງໝົດ', value: '' }, ...mapped]
     }
   } catch (err) {
     console.error('fetchDocTypes error:', err)
@@ -99,7 +174,8 @@ async function fetchBranches() {
     const endpoint = `${base.replace(/\/$/, '')}/Branch/getComboxBranchStatus`
     const { data } = await axios.post(endpoint, {})
     if (data && data.resData) {
-      branches.value = data.resData.map(b => ({ label: b.brNameLa || b.brName || b.branchCode, value: b.branchCode }))
+        const mapped = data.resData.map(b => ({ label: b.brNameLa || b.brName || b.branchCode, value: b.branchCode }))
+        branches.value = [{ label: 'ທັງໝົດ', value: '' }, ...mapped]
     }
   } catch (err) {
     console.error('fetchBranches error:', err)
@@ -339,6 +415,10 @@ function scheduleFetch() {
 watch(startDate, () => scheduleFetch())
 watch(endDate, () => scheduleFetch())
 
+// Auto-trigger fetch when doc type or branch selection changes
+watch(selectedDocType, () => scheduleFetch())
+watch(selectedBranch, () => scheduleFetch())
+
 // Preset helpers for the search card
 function setToday() {
   const d = new Date()
@@ -383,13 +463,29 @@ const summaryChart = computed(() => {
   const dates = Array.from(map.keys()).sort((a, b) => new Date(a) - new Date(b))
   const data = dates.map(d => map.get(d) || 0)
 
+  // Lao month names for monthly labels
+  const laoMonths = ['', 'ມັງກອນ', 'ກຸມພາ', 'ມີນາ', 'ເມສາ', 'ພຶດສະພາ', 'ມິຖຸນາ', 'ກໍລະກົດ', 'ສິງຫາ', 'ກັນຍາ', 'ຕຸລາ', 'ພະຈິກ', 'ທັນວາ']
+  function monthLabelFromDate(d) {
+    if (!d) return d
+    // Accept formats like '01', '1', 'YYYY-MM' or 'YYYY-MM-DD'
+    let m = ''
+    if (/^\d{1,2}$/.test(d)) m = String(d).padStart(2, '0')
+    else if (/^\d{4}-\d{2}/.test(d)) m = d.slice(5, 7)
+    else if (/^\d{2}-\d{4}/.test(d)) m = d.slice(0, 2)
+    const idx = parseInt(m.replace(/^0/, ''), 10)
+    if (!isNaN(idx) && idx >= 1 && idx <= 12) return laoMonths[idx]
+    return d
+  }
+
+  const categories = dates.map(d => monthLabelFromDate(d))
+
   return {
     series: [{ name: 'ຈຳນວນ', data }],
     chartOptions: {
       chart: { type: 'bar', fontFamily: 'Phetsalate, Noto Sans Lao UI, sans-serif' },
       plotOptions: { bar: { borderRadius: 8 } },
       dataLabels: { enabled: true, formatter: val => formatNumber(val) },
-      xaxis: { categories: dates, labels: { formatter: val => val }, tooltip: { enabled: true } },
+      xaxis: { categories, labels: { formatter: val => val }, tooltip: { enabled: true } },
       yaxis: { labels: { formatter: val => formatNumber(val) } },
       title: { text: `ສະຫຼຸບສະຖິຕິ ( ${startDate.value || ''} → ${endDate.value || ''} )`, align: 'center' }
     }
@@ -399,19 +495,19 @@ const summaryChart = computed(() => {
 
 <template>
   <v-container>
-    <!-- Search form -->
-    <v-card class="pa-4 mb-6 elevation-12 search-card">
+    <!-- Summary cards -->
+<v-card class="pa-4 mb-6 elevation-12 search-card">
       <v-card-title class="blue--text text-h6 d-flex align-center" style="padding:12px 20px;">
             <div class="d-flex align-center">
               <v-icon start color="blue">mdi-magnify</v-icon>
               ຄົ້ນຫາຂໍ້ມູນ
             </div>
             <v-spacer />
-            <div class="search-presets d-flex">
+            <!-- <div class="search-presets d-flex">
               <v-btn small class="preset" @click="setToday">ມື້ນີ້</v-btn>
               <v-btn small class="preset" @click="setThisMonth">ເດືອນນີ້</v-btn>
               <v-btn small class="preset muted" @click="clearDates">ລ້າງ</v-btn>
-            </div>
+            </div> -->
           </v-card-title>
       <v-card-text>
         <v-row>
@@ -427,7 +523,7 @@ const summaryChart = computed(() => {
                 <v-text-field
                   v-bind="props"
                   v-model="startDate"
-                  label="Start Date"
+                  label="ວັນທີ່"
                   prepend-inner-icon="mdi-calendar"
                   outlined
                   dense
@@ -452,7 +548,7 @@ const summaryChart = computed(() => {
                 <v-text-field
                   v-bind="props"
                   v-model="endDate"
-                  label="End Date"
+                  label="ຫາວັນທີ່"
                   prepend-inner-icon="mdi-calendar"
                   outlined
                   dense
@@ -465,12 +561,44 @@ const summaryChart = computed(() => {
               <v-date-picker v-model="endDate" @input="endMenu = false" scrollable />
             </v-menu>
           </v-col>
-          
+        
+          <v-col cols="12" sm="6" md="3" v-if="docTypes.length > 0">
+            <v-select
+              :items="docTypes"
+              v-model="selectedDocType"
+              label="Filter ປະເພດ"
+              item-title="label"
+              item-value="value"
+              dense
+              outlined
+              clearable
+              class="white-input"
+            />
+          </v-col>
+          <v-col cols="12" sm="6" md="3" v-if="branches.length > 0">
+            <v-select
+              :items="branches"
+              v-model="selectedBranch"
+              label="Filter ຝ່າຍ"
+              item-title="label"
+              item-value="value"
+              dense
+              outlined
+              clearable
+              class="white-input"
+            />
+          </v-col>
+         
         </v-row>
+          <v-btn small class="preset muted" @click="clearDates">ເລີ່ມໃໝ່</v-btn>
       </v-card-text>
+    </v-card>
+    <!-- end title -->
+    <!-- Search form -->
+    <v-card class="pa-4 mb-6 elevation-12 search-card">
       <v-row class="stat-grid">
-        <v-col class="stat-col" cols="12" sm="6" md="auto">
-        <v-card class="pa-3 elevation-2 stat-card">
+        <v-col class="stat-col card1" cols="6" sm="6" md="auto">
+        <v-card class="pa-3 elevation-2 stat-card" @click="openPopupFor('ALL')" style="cursor:pointer">
           <div class="stat-row">
             <div class="stat-left">
               <div class="stat-title">ລວມທັງໝົດ</div>
@@ -486,8 +614,8 @@ const summaryChart = computed(() => {
         </v-card>
       </v-col>
 
-      <v-col class="stat-col" cols="12" sm="6" md="auto">
-        <v-card class="pa-3 elevation-2 stat-card">
+      <v-col class="stat-col card2" cols="6" sm="6" md="auto">
+        <v-card class="pa-3 elevation-2 stat-card" @click="openPopupFor('N')" style="cursor:pointer">
           <div class="stat-row">
             <div class="stat-left">
               <div class="stat-title">ເອກະສານໃໝ່</div>
@@ -503,8 +631,8 @@ const summaryChart = computed(() => {
         </v-card>
       </v-col>
 
-      <v-col class="stat-col" cols="12" sm="6" md="auto">
-        <v-card class="pa-3 elevation-2 stat-card">
+      <v-col class="stat-col card3" cols="6" sm="6" md="auto">
+        <v-card class="pa-3 elevation-2 stat-card" @click="openPopupFor('O')" style="cursor:pointer">
           <div class="stat-row">
             <div class="stat-left">
               <div class="stat-title">ເອກະສານເກົ່າ</div>
@@ -520,8 +648,8 @@ const summaryChart = computed(() => {
         </v-card>
       </v-col>
 
-      <v-col class="stat-col" cols="12" sm="6" md="auto">
-        <v-card class="pa-3 elevation-2 stat-card">
+      <v-col class="stat-col card4" cols="6" sm="6" md="auto">
+        <v-card class="pa-3 elevation-2 stat-card" @click="openPopupFor('NN')" style="cursor:pointer">
           <div class="stat-row">
             <div class="stat-left">
               <div class="stat-title">ຮ່າງໃໝ່</div>
@@ -536,8 +664,8 @@ const summaryChart = computed(() => {
           </div>
         </v-card>
       </v-col>
-      <v-col class="stat-col" cols="12" sm="6" md="auto">
-        <v-card class="pa-3 elevation-2 stat-card">
+      <v-col class="stat-col card5" cols="6" sm="6" md="auto">
+        <v-card class="pa-3 elevation-2 stat-card" @click="openPopupFor('OO')" style="cursor:pointer">
           <div class="stat-row">
             <div class="stat-left">
               <div class="stat-title">ຮ່າງປັບປຸ່ງ</div>
@@ -554,6 +682,7 @@ const summaryChart = computed(() => {
       </v-col>
     </v-row>
     </v-card>
+    
 
     <!-- Charts -->
     <v-row class="mt-6">
@@ -589,7 +718,9 @@ const summaryChart = computed(() => {
               </div>
             </div>
             <div style="width:96px;text-align:right;font-weight:600">
-              <div>{{ formatNumber(item.value) }}</div>
+              <div style="font-size:18px; color:black; font-weight:bold;">
+                {{ formatNumber(item.value) }}
+              </div>
               <div style="font-size:12px;color:#6b7280">{{ item.pct }}%</div>
             </div>
           </div>
@@ -633,8 +764,10 @@ const summaryChart = computed(() => {
                 <div :style="{ width: item.pct + '%', background: item.color, height: '10px', borderRadius: '8px' }"></div>
               </div>
             </div>
-            <div style="width:96px;text-align:right;font-weight:600">
-              <div>{{ formatNumber(item.value) }}</div>
+            <div style="width:96px;text-align:right;font-weight:00">
+                <div style="font-size:18px; color:black; font-weight:bold;">
+                   {{ formatNumber(item.value) }}
+                </div>
               <div style="font-size:12px;color:#6b7280">{{ item.pct }}%</div>
             </div>
           </div>
@@ -648,6 +781,73 @@ const summaryChart = computed(() => {
   </v-col>
 </v-row>
     <!-- end -->
+
+    <!-- Popup dialog to show documents for a stat category -->
+    <v-dialog v-model="popupDialog">
+      <v-card class="popup-card elevation-12">
+        <v-card-title class="popup-title d-flex align-center">
+          <div class="title-text">{{ popupTitleText }}</div>
+          <v-spacer />
+          <v-btn icon style="color :red" @click="popupDialog = false"><v-icon>mdi-close</v-icon></v-btn>
+        </v-card-title>
+        <v-divider />
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-progress-circular v-if="popupLoading" indeterminate color="primary"></v-progress-circular>
+                <div v-else>
+                  <div class="popup-table-wrap">
+                    <table class="popup-table">
+                      <thead>
+                        <tr>
+                          <th v-for="h in popupHeaders" :key="h.value">{{ h.text }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="item in pagedPopupData" :key="item.id">
+                          <td>{{ item.id }}</td>
+                          <td>{{ item.docNo }}</td>
+                          <td>{{ item.docDescLao }}</td>
+                          <td style="max-width:360px;">{{ item.subjectName }}</td>
+                          <td>{{ item.docDate }}</td>
+                          <td>
+                            <div v-if="item.relatedShowList02 && item.relatedShowList02.length">
+                              <div v-for="(r, idx) in item.relatedShowList02" :key="idx">{{ r.relatedShowName }} ({{ r.relatedShowDocNo }})</div>
+                            </div>
+                          </td>
+                          <td style="max-width:360px;">
+                            <a v-if="item.docPathLa" :href="item.docPathLa" target="_blank" class="icon-link">
+                              <v-icon color="red">mdi-file-pdf-box</v-icon>
+                            </a>
+                          </td>
+                          <td style="max-width:360px;">
+                            <a v-if="item.docPath" :href="item.docPath" target="_blank" class="icon-link">
+                              <v-icon color="blue">mdi-file-pdf-box</v-icon>
+                            </a>
+                          </td>
+                        </tr>
+                        <tr v-if="!pagedPopupData || pagedPopupData.length === 0">
+                          <td :colspan="popupHeaders.length" class="text-center">No data</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <!-- pagination -->
+                    <div class="d-flex justify-center pa-4" style="background: transparent;">
+                      <v-pagination v-model="popupPage" :length="popupPageCount" total-visible="5" color="primary" />
+                    </div>
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click="popupDialog = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- chart grap -->
     <v-row class="mt-6">
@@ -741,6 +941,14 @@ const summaryChart = computed(() => {
   color: #0d47a1 !important;
   opacity: 0.98;
 }
+/* Prominent preset button style (used by the reset button) */
+.preset {
+
+  box-shadow: 0 10px 26px rgba(11,121,208,0.18) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+}
+.preset:hover { filter: brightness(0.95); transform: translateY(-1px); }
+.preset.muted { background: linear-gradient(90deg,#6fb8ff 0%,#2a8ee0 100%); color: #fff !important; }
 .search-card .v-label {
   color: rgba(0,0,0,0.65) !important;
 }
@@ -805,9 +1013,64 @@ const summaryChart = computed(() => {
 }
 .stat-row { display:flex; align-items:center; width:100%; }
 .stat-left { flex:1 }
-.stat-title { font-size:13px; color:#6b7280; font-weight:600 }
-.stat-grid { display:flex; flex-wrap:wrap; gap:16px; }
-.stat-grid .stat-col { flex: 0 0 20%; max-width: 20%; box-sizing: border-box; padding: 0 8px; }
+.stat-title { font-size:12px; color:#6b7280; font-weight:600 }
+.stat-grid { display:flex; flex-wrap:wrap; gap:1px; align-items:stretch }
+.stat-grid .stat-col {
+  flex: 0 0 19.5% !important;
+  max-width: 20% !important;
+  box-sizing: border-box;
+  padding: 1px;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+/* Card 1: Blue gradient */
+.stat-grid .card1 {
+  background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+}
+
+/* Card 2: Light Blue gradient */
+.stat-grid .card2 {
+  background: linear-gradient(to bottom right, #00c6ff, #0072ff);
+}
+
+/* Card 3: Blue-Green gradient */
+.stat-grid .card3 {
+  background: linear-gradient(to bottom right, #43cea2, #185a9d);
+}
+
+/* Card 4: Purple-Blue gradient */
+.stat-grid .card4 {
+  background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+}
+
+/* Card 5: Cyan gradient */
+.stat-grid .card5 {
+  background: linear-gradient(to bottom right, #00b4db, #0083b0);
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+/* Ensure v-col wrapper honors the 20% width and avoid extra padding causing wrap */
+.stat-grid > .v-col { flex: 0 0 20% !important; max-width: 20% !important; padding: 0 8px !important; box-sizing: border-box; }
+
+/* On wide screens force no-wrap so all five fit on one row; allow scroll if viewport too small */
+@media (min-width: 1201px) {
+  .stat-grid { flex-wrap: nowrap !important; }
+  .stat-grid { overflow-x: auto; }
+  .stat-grid > .v-col { padding: 0 800px !important; }
+  .stat-card { padding: 20px !important; }
+}
+
+/* Reduce icon size within the small icon box to avoid overflow */
+.stat-icon-box .v-icon { font-size:20px !important; }
 
 @media (max-width: 1200px) {
   .stat-grid .stat-col { flex: 0 0 50%; max-width: 50%; }
@@ -816,15 +1079,90 @@ const summaryChart = computed(() => {
 @media (max-width: 600px) {
   .stat-grid .stat-col { flex: 0 0 100%; max-width: 100%; }
 }
-.stat-value { font-size:20px; font-weight:800; margin-top:6px; }
+.stat-value { font-size:16px; font-weight:800; margin-top:6px; }
 .stat-link { display:inline-block; margin-top:8px; font-size:13px; color:#2563eb }
 .stat-right { width:72px; display:flex; justify-content:center; align-items:center }
-.stat-icon-box { width:48px; height:48px; border-radius:8px; background: linear-gradient(180deg,#e6f4ff,#d9eefc); display:flex; justify-content:center; align-items:center; box-shadow: 0 6px 18px rgba(14,122,255,0.08) }
+.stat-icon-box { width:40px; height:40px; border-radius:8px; background: linear-gradient(180deg,#e6f4ff,#d9eefc); display:flex; justify-content:center; align-items:center; box-shadow: 0 6px 18px rgba(14,122,255,0.08) }
+
+@media (max-width: 1200px) {
+  .stat-grid .stat-col { flex: 0 0 50% !important; max-width: 50% !important; }
+}
 
 @media (max-width: 900px) {
-  .stat-value { font-size:18px }
-  .stat-icon-box { width:40px; height:40px }
-  .stat-right { width:64px }
+  .stat-grid .stat-col { flex: 0 0 100% !important; max-width: 100% !important; }
+  .stat-value { font-size:15px }
+  .stat-title { font-size:12px }
 }
+.popup-card { border-radius: 12px; overflow: hidden; }
+.popup-card { border-radius: 12px; overflow: hidden; border: 2px solid rgba(212,175,55,0.18); box-shadow: 0 14px 40px rgba(3,60,98,0.18); }
+.popup-title { background: linear-gradient(180deg,#0b66a8 0%, #094a7a 100%); color: #ffffff; padding: 14px 20px; border-bottom: 2px solid rgba(212,175,55,0.15) }
+.popup-title .title-text { font-weight:800; font-size:16px; color: #fff }
+.popup-close .v-icon { color: #fff }
+.popup-table-wrap {
+  padding: 8px;
+  background: linear-gradient(180deg, #0e5998 0%, #0b4b79 100%);
+  overflow-x: auto;
+}
+.popup-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  table-layout: auto;
+  color: #fff;
+}
+.popup-table thead th {
+  background: linear-gradient(180deg,#0b66a8 0%, #08466a 100%);
+  color: #fff;
+  font-weight: 800;
+  border-right: 1px solid rgba(212,175,55,0.12);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+.popup-table thead th:last-child { border-right: none }
+.popup-table tbody tr {
+  background: linear-gradient(180deg,#0d4e86 0%, #083c62 100%);
+  border-bottom: 1px solid rgba(212,175,55,0.06);
+}
+.popup-table tbody tr:hover { background: linear-gradient(90deg,#0f77c1,#0b5ea0) }
+.popup-table td {
+  vertical-align: middle;
+  padding: 12px 16px;
+  color: #fff;
+  border-right: 1px solid rgba(212,175,55,0.04);
+  white-space: normal;
+  word-break: break-word;
+}
+.popup-table td:last-child { border-right: none }
+.popup-table .icon-link { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px }
+.popup-table .v-icon { color: #ffd666 }
+.popup-table .text-center { color: #ffd666 }
+
+/* Make popup pagination numbers white and visible */
+.popup-table-wrap .v-pagination { display:flex; justify-content:center; padding:8px 0; }
+.popup-table-wrap .v-pagination button {
+  color: #fff !important;
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  min-width: 36px;
+  height: 36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.popup-table-wrap .v-pagination button:hover {
+  background: rgba(255,255,255,0.06) !important;
+  color: #fff !important;
+}
+.popup-table-wrap .v-pagination button.v-pagination-item--active {
+  background: rgba(255,255,255,0.12) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+
+
 
 </style>
