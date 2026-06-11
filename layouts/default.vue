@@ -22,19 +22,20 @@
 }
 
 .page-container {
-    /* occupy ~90% of viewport width while capping at a reasonable max */
-    width: 80vw;
-    max-width: 1500px;
-    margin: 8px auto 18px auto;
-    padding: 12px 18px;
+    /* occupy full viewport width so content can be viewed fullscreen */
+    width: 100vw;
+    max-width: 100%;
+    margin: 0;
+    padding: 18px;
     box-sizing: border-box;
+    min-height: calc(100vh - 120px);
 }
 
 @media (min-width: 1400px) {
-    .page-container { width: 80vw; }
+    .page-container { width: 100vw; }
 }
 
 @media (max-width: 900px) {
-    .page-container { padding: 12px; margin: 12px; width: 94vw; max-width: 100%; }
+    .page-container { padding: 12px; margin: 12px; width: 100vw; max-width: 100%; }
 }
 </style>

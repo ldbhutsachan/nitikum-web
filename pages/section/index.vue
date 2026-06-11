@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card width="1000" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card width="2800" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn elevation="0" style="background: linear-gradient(to top, #003E73,#065D9E,#0978BF);color: white;"
                 @click="showDialogAdd = true">
                 <Icon name="mingcute:plus-line" />
@@ -9,7 +9,7 @@
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ sectiontList?.length
                 }})</span>
         </v-card>
-        <v-card width="1000" class="mx-auto card-shadow pa-10" rounded="lg" >
+        <v-card width="2800" class="mx-auto card-shadow pa-10" rounded="lg" >
             <div class="d-flex align-center" >
                 <v-text-field v-model="search" label="ຄົ້ນຫາ..." density="comfortable" clearable></v-text-field>
                 

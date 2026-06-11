@@ -3,18 +3,10 @@
 
         <div style="display: flex;flex-direction: column;justify-content: space-between;align-items: center;width: 100%;background: linear-gradient(to top, #003E73,#065D9E,#0978BF)">
             <div class="pt-6" style="width: 100%;">
-                <v-card max-width="1500" color="transparent" class="mx-auto rounded-0" elevation="0">
+                <v-card max-width="2800" color="transparent" class="mx-auto rounded-0" elevation="0">
+
                     <div class="d-flex align-center">
                         <img class="mx-auto" src="../../assets/icons/gold.webp" width="250" />
-                        <!-- <div style="display: flex;justify-content: start;align-items: center;">
-                            <img class="mx-auto" src="../../assets/icons/newLogo.jpeg" width="70"
-                                style="border-radius: 50px;" />
-                            <div class="pl-2" style="line-height: 18px">
-                                <span style="color:#F4D478;font-size: 13pt;">ທະນາຄານພັດທະນາລາວ</span><br />
-                                <div style="border-top: 1px solid #F4D478;"></div>
-                                <span style="color:#F4D478;font-size: 10pt;">老挝开发银行LDB BANK</span>
-                            </div>
-                        </div> -->
                         <div style="display: flex;flex-direction: row;justify-content: center;align-items: center;line-height: 30px;border-left: 0.5px solid #F4D478"
                             class="ml-4 pl-4">
                             <span style="font-size: 20pt;color: #F4D478;">ລະບົບຄຸ້ມຄອງນິຕິກຳ</span>
@@ -59,7 +51,7 @@
             </div>
             <div style="width: 100% "
                 class="mt-6">
-                <v-card width="1500" color="transparent" class="mx-auto rounded-0" elevation="0" style="border-top: 1px solid #F2D074" >
+                <v-card width="2800" color="transparent" class="mx-auto rounded-0" elevation="0" style="border-top: 1px solid #F2D074" >
                     <div class="d-flex align-center">
                         <v-btn color="white" height="40" to="/home">
                             <Icon name="iconoir:home-alt-slim" size="22"/> 

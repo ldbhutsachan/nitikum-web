@@ -34,9 +34,11 @@ const popupStatusLabel = computed(() => {
   }
 })
 const popupTotalCount = computed(() => (popupData.value ? popupData.value.length : 0))
+const popupCustomLabel = ref('')
 const popupTitleText = computed(() => {
   if (popupLoading.value) return `${popupStatusLabel.value} — ກຳລັງໂຫຼດ...`
-  return `${popupStatusLabel.value} — ${popupTotalCount.value} ລາຍການ`
+  const label = popupCustomLabel.value || popupStatusLabel.value
+  return `${label} — ${popupTotalCount.value} ລາຍການ`
 })
 const popupHeaders = computed(() => {
     return [
@@ -91,6 +93,37 @@ function openPopupFor(status) {
   popupStatus.value = status
   popupPage.value = 1
   fetchPopup(status)
+}
+
+function openPopupForTransactionItem(item) {
+  // map clicked transaction to the explicit doctype requested by user when appropriate
+  // if the clicked item matches the special name, send that exact doctype string
+  const specialName = 'ແຈ້ງການຜັນຂະຫຍາຍ ມະຕິກອງປະຊຸມ'
+  if ((item.name || '').includes('ແຈ້ງການ') || item.name === specialName) {
+    selectedDocType.value = specialName
+  } else {
+    const found = (transactions.value || []).find(t => (t.typeDocumentName === item.name) || (t.docDescLao === item.name) || (t.typeDocument === item.name) )
+    selectedDocType.value = found ? (found.docType || found.typeDocument || found.typeDocumentId || '') : ''
+  }
+  popupCustomLabel.value = `ເອກະສານ: ${item.name}`
+  popupStatus.value = 'ALL'
+  popupPage.value = 1
+  fetchPopup('ALL')
+}
+
+function openPopupForSectionItem(item) {
+  // map clicked section to the explicit secCode requested by user when appropriate
+  const specialSec = 'ຝ່າຍບັນຊີ ແລະ ການເງິນ'
+  if ((item.name || '').includes('ບັນຊີ') || item.name === specialSec) {
+    selectedBranch.value = specialSec
+  } else {
+    const found = (sections.value || []).find(s => (s.secName === item.name) || (s.brName === item.name) )
+    selectedBranch.value = found ? (found.branchCode || found.brCode || found.branch || found.secBranch || '') : ''
+  }
+  popupCustomLabel.value = `ຝ່າຍ: ${item.name}`
+  popupStatus.value = 'ALL'
+  popupPage.value = 1
+  fetchPopup('ALL')
 }
 
 const fetchDashboard = async () => {
@@ -711,7 +744,7 @@ const summaryChart = computed(() => {
       <v-card-text>
         <div>
           <div v-for="item in transactionItemsPaged" :key="item.name" class="d-flex align-center" style="padding:10px 0;border-bottom:0px solid transparent">
-            <div style="width:30%;font-weight:500">{{ item.name }}</div>
+                    <div @click.stop="openPopupForTransactionItem(item)" style="width:30%;font-weight:500;cursor:pointer">{{ item.name }}</div>
             <div style="flex:1;margin:0 12px">
               <div style="background:#eceff1;border-radius:8px;height:10px;position:relative;overflow:hidden">
                 <div :style="{ width: item.pct + '%', background: item.color, height: '10px', borderRadius: '8px' }"></div>
@@ -758,7 +791,7 @@ const summaryChart = computed(() => {
       <v-card-text>
         <div>
           <div v-for="item in sectionItemsPaged" :key="item.name" class="d-flex align-center" style="padding:10px 0;border-bottom:0px solid transparent">
-            <div style="width:30%;font-weight:500">{{ item.name }}</div>
+            <div @click.stop="openPopupForSectionItem(item)" style="width:30%;font-weight:500;cursor:pointer">{{ item.name }}</div>
             <div style="flex:1;margin:0 12px">
               <div style="background:#eceff1;border-radius:8px;height:10px;position:relative;overflow:hidden">
                 <div :style="{ width: item.pct + '%', background: item.color, height: '10px', borderRadius: '8px' }"></div>
@@ -1164,5 +1197,26 @@ const summaryChart = computed(() => {
 }
 
 
+/* Make dashboard area truly edge-to-edge: remove inner card margins and expand content */
+.v-application .v-main .dashboard-bg {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.dashboard-bg .v-card {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  border-radius: 6px !important;
+}
+.dashboard-bg .search-card {
+  border-radius: 6px !important;
+  margin: 0 16px !important;
+  width: calc(100% - 32px) !important;
+}
+.dashboard-bg .v-row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
 
 </style>

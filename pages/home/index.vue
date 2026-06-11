@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card max-width="1500" class="mx-auto card-shadow" rounded="lg">
+        <v-card max-width="2800" class="mx-auto card-shadow" rounded="lg">
 
             <v-card-text>
                 <v-carousel cycle show-arrows="hover" height="400" hide-delimiter-background>
@@ -135,10 +135,10 @@
                     </template>
                 </v-data-table>
             </v-card-text>
-        </v-card>
+        <!-- </v-card> -->
 
         <!-- Old Regulations Section -->
-        <v-card max-width="1500" class="mx-auto card-shadow" rounded="lg">
+        <!-- <v-card max-width="1500" class="mx-auto card-shadow" rounded="lg"> -->
 
             <v-card-text>
                 <div class="pt-5">

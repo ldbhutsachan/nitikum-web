@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card max-width="1400" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
+        <v-card max-width="2650" flat class="mx-auto pb-4 d-flex align-center" style="background-color: #ECF5F8;">
             <v-btn icon style="background: linear-gradient(to top, #003E73,#065D9E,#0978BF);color: white;"  @click="showDialogAddUser = true">
                 <Icon name="mingcute:plus-line" />
             </v-btn>

@@ -374,7 +374,19 @@ const onGetDataUpdateInfo = (items: any) => {
     keyUpData.value = items?.id
     updateTitle.value = items?.subjectName
     updateDocNo.value = items?.docNo
-    updateDatetime.value = items?.docDate
+    // Normalize incoming date to YYYY-MM-DD so the picker/text field shows consistent format
+    if (items?.docDate) {
+        const parsed = moment(items.docDate, ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'MM/DD/YYYY', moment.ISO_8601], true)
+        if (parsed.isValid()) {
+            updateDatetime.value = parsed.format('YYYY-MM-DD')
+        } else {
+            // fallback: try non-strict parse
+            const loose = moment(items.docDate)
+            updateDatetime.value = loose.isValid() ? loose.format('YYYY-MM-DD') : items.docDate
+        }
+    } else {
+        updateDatetime.value = ''
+    }
     updateDocType.value = items?.docType
     updateShareType.value = items?.sharingType === 'Normal-ອະນຸຍາດໃຫ້ທຸກຄົນເຫັນຂໍ້ມູນ' ? 'N' : 'V'
     updateType.value = items?.typeDoc === 'ຮ່າງໃໝ່' ? 'ຮ່າງໃໝ່' : 'ປັບປຸງ'

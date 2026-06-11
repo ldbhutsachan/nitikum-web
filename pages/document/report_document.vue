@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-card max-width="1500" elevation="0" class="mx-auto rounded-lg d-flex align-center">
+        <v-card max-width="2800" elevation="0" class="mx-auto rounded-lg d-flex align-center">
             <v-card-text class="pt-4">
                 <v-label>ຄົ້ນຫາຂໍ້ມູນ</v-label>
                 <br><br>
@@ -52,7 +52,7 @@
 
     </div>
     <div class="pt-5">
-        <v-card max-width="1500" class="mx-auto">
+        <v-card max-width="2800" class="mx-auto">
             <div v-for="(data, index) in documentList" :key="index">
                 <v-table id="export-excel">
                     <thead v-if="index === 0">

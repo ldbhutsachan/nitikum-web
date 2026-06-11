@@ -67,6 +67,10 @@ const onLogin = async () => {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+        /* render login page at 68% zoom */
+        zoom: 68%;
+        transform: scale(0.68);
+        transform-origin: 0 0;
     display: flex;
     flex-direction: row;
     justify-content: center;

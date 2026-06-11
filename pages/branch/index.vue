@@ -1,13 +1,13 @@
 <template>
     <div>
-        <v-card max-width="1000" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
+        <v-card max-width="2800" flat class="mx-auto pb-4" style="background-color: #ECF5F8;">
             <v-btn icon style="background: linear-gradient(to top, #003E73,#065D9E,#0978BF);color: white;"
                 @click="showDialogAddbranch = true">
                 <Icon name="mingcute:plus-line" />
             </v-btn>
             <span class="ml-4 text-green" style="font-weight: bold;font-size: 18pt;">ທັງໝົດ: ({{ branchList?.resData?.length }})</span>
         </v-card>
-        <v-card max-width="1000" elevation="5" class="mx-auto rounded-lg">
+        <v-card max-width="2800" elevation="5" class="mx-auto rounded-lg">
             <div class="d-flex align-center" >
                 <v-text-field v-model="search" label="ຄົ້ນຫາ..." density="comfortable" clearable></v-text-field>
             </div>
